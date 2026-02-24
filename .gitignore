@@ -7,3 +7,9 @@ __pycache__/
 .env
 .lnk
 .idea/
+*.cfg
+bin/
+cache/
+icons/
+include/
+venv311/
