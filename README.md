@@ -2,13 +2,13 @@
 Csci 387 Group 6 Project. 
 
 ## Members
-* Murodjon Abduganiev
-* Md Jannatul Ferdous
+* [Murodjon Abduganiev](https://github.com/a-muratuch)
+* [Md Jannatul Ferdous](https://github.com/mferdous9900)
 * [Joshua Jones-Reed](https://github.com/joshreed48)
 * [Diego Ruiz](https://github.com/sanicsquirtle420)
 
 ## Documentation
-This app uses python version `3.11`
+This app uses Python version `3.11` and Kivy version `2.3.1`
 
 ### Initial Setup
 > [!IMPORTANT]
