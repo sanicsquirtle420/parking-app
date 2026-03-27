@@ -21,5 +21,9 @@ sudo apt install python3.11 python3.11-venv python3.11-dev
 cd [PATH_TO_PROJECT]
 python3.11 -m venv venv311
 source venv311/bin/activate
-pip install kivy kivy_garden
+```
+
+Dependencies:
+```bash
+pip install kivy kivy_garden dotenv sshtunnel
 ```
