@@ -25,5 +25,10 @@ source venv311/bin/activate
 
 Dependencies:
 ```bash
-pip install kivy kivy_garden dotenv sshtunnel
+pip install kivy kivy_garden dotenv sshtunnel mariadb paramiko
+```
+
+Ubuntu / Debian
+```bash
+sudo apt install libmariadb3 libmariadb-dev
 ```

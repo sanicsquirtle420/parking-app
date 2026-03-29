@@ -1,3 +1,6 @@
+import sys, os
+sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
+
 from db import get_connection
 
 def create_user(user_id, first_name, last_name, email, password_hash, role):
@@ -94,4 +97,3 @@ def delete_user(user_id):
     finally:
         cursor.close()
         conn.close()
-

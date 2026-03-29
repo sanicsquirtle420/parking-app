@@ -1,7 +1,7 @@
-import mariadb
-import os
 from sshtunnel import SSHTunnelForwarder
 from dotenv import load_dotenv
+import mariadb
+import os
 
 load_dotenv()
 
