@@ -6,6 +6,7 @@ from kivy.uix.label import Label
 from kivy.uix.textinput import TextInput
 from kivy.uix.button import Button
 from kivy.graphics import Color, Rectangle
+from database.queries.users import get_user
 
 
 def red_button(text):
@@ -45,6 +46,7 @@ class LoginScreen(Screen):
 
         self.username = TextInput(hint_text="User ID", multiline=False, size_hint_y=None, height=48)
         self.password = TextInput(hint_text="Password", password=True, multiline=False, size_hint_y=None, height=48)
+        self.password.bind(on_text_validate=lambda *a: self.login(None))
 
         root.add_widget(self.username)
         root.add_widget(self.password)
@@ -78,13 +80,20 @@ class LoginScreen(Screen):
             self.error.text = "Enter User ID and Password"
             return
 
+        user = get_user(self.username.text)
+        if user is None:
+            self.error.text = "User not found"
+            return
+        if user["password_hash"] != self.password.text:
+            self.error.text = "Incorrect password"
+            return
+
         app = App.get_running_app()
-        permit = app.infer_permit(self.username.text)
 
         app.user_data = {
-            "username": self.username.text,
-            "role": permit,
-            "permit": permit,
+            "username": f"{user['first_name']} {user['last_name']}",
+            "role": f"R: {user['role']}",
+            "permit": f"P: {user['role']}",
         }
 
         self.manager.current = "main"
