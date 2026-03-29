@@ -1,15 +1,12 @@
-from kivy.app import App
+from utils.create_account_screen import CreateAccountScreen
 from kivy.uix.screenmanager import ScreenManager, Screen
-
+from utils.login_screen import LoginScreen
 from utils.lot_outlines import LotOutline
 from kivy.uix.boxlayout import BoxLayout
 from kivy_garden.mapview import MapView
 from utils.buttons import Buttons
 from utils.lot_cords import *
-
-from login_screen import LoginScreen
-from create_account_screen import CreateAccountScreen
-
+from kivy.app import App
 
 class MainScreen(Screen):
     def __init__(self, **kwargs):
