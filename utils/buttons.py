@@ -43,7 +43,7 @@ class Buttons(BoxLayout):
         self.add_widget(self.user_label)
 
         btn1 = Button(
-            text="See Tickets",
+            text="See Tickets(test)",
             background_normal="",
             background_color=(0.816, 0.125, 0.176, 1),
             size_hint_y=None,
@@ -73,8 +73,9 @@ class Buttons(BoxLayout):
             height=BTN_HEIGHT,
         )
 
-        self.add_widget(btn1)
+        self.add_widget(btn1)        
         # TODO: Add function to display Tickets page
+        btn1.bind(on_press=self.go_to_tickets)
         self.add_widget(btn2)
         btn2.bind(on_press=self.go_to_login)
         z_in.bind(on_press=self.zoom_in)
@@ -122,3 +123,8 @@ class Buttons(BoxLayout):
     def update_rect(self, *args):
         self.rect.pos = self.pos
         self.rect.size = self.size
+
+    def go_to_tickets(self, instance):
+        print("Button clicked!")
+        app = App.get_running_app()
+        app.root.current = "tickets"

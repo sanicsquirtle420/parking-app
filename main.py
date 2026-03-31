@@ -6,6 +6,7 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy_garden.mapview import MapView
 from utils.buttons import Buttons
 from utils.lot_cords import *
+from utils.tickets_screen import TicketsScreen
 from kivy.app import App
 
 class MainScreen(Screen):
@@ -57,6 +58,7 @@ class MainApp(App):
         sm.add_widget(LoginScreen(name="login"))
         sm.add_widget(CreateAccountScreen(name="create"))
         sm.add_widget(MainScreen(name="main"))
+        sm.add_widget(TicketsScreen(name="tickets"))
 
         return sm
 
