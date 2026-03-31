@@ -32,3 +32,6 @@ Ubuntu / Debian
 ```bash
 sudo apt install libmariadb3 libmariadb-dev
 ```
+
+> [!NOTE]
+> The `.env` file should be in `/database` to work properly.
