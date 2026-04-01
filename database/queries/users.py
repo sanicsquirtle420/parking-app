@@ -29,7 +29,13 @@ def get_user(user_id):
 
     try:
         cursor.execute("""
-            SELECT * FROM users WHERE user_id = %s
+            SELECT 
+                u.*, 
+                p.permit_name AS user_permit_name 
+            FROM users u
+            LEFT JOIN user_permits up ON u.user_id = up.user_id
+            LEFT JOIN permits p ON up.permit_id = p.permit_id
+            WHERE u.user_id = %s
         """, (user_id,))
 
         return cursor.fetchone()

@@ -75,6 +75,8 @@ class LoginScreen(Screen):
         self.rect.size = self.size
         self.rect.pos = self.pos
 
+    #NEEDED TO CHANGE LOGIN INFORMATION TO GET USERID INFORMATION
+
     def login(self, instance):
         if not self.username.text or not self.password.text:
             self.error.text = "Enter User ID and Password"
@@ -91,10 +93,11 @@ class LoginScreen(Screen):
         app = App.get_running_app()
 
         app.user_data = {
-            "username": f"{user['first_name']} {user['last_name']}",
-            "role": f"R: {user['role']}",
-            "permit": f"P: {user['role']}",
-        }
+                "user_id": user['user_id'],
+                "username": f"{user['first_name']} {user['last_name']}",
+                "email": user['email'],
+                "permit": user.get('user_permit_name') or "No Permit Assigned"
+            }
 
         self.manager.current = "main"
         self.manager.get_screen("main").refresh_sidebar()

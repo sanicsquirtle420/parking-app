@@ -37,13 +37,18 @@ class Buttons(BoxLayout):
         self.user_label = Label(
             text=self.get_user_text(),
             size_hint_y=None,
-            height=40,
+            height=150,
             color=(0.7, 0.8, 1, 1),
+            halign="center",
+            valign="middle",
+            markup=True,
+            text_size=(self.width, None)
         )
+        self.user_label.bind(size=lambda s, w: s.setter('text_size')(s, (s.width, None)))
         self.add_widget(self.user_label)
 
         btn1 = Button(
-            text="See Tickets(test)",
+            text="See Tickets",
             background_normal="",
             background_color=(0.816, 0.125, 0.176, 1),
             size_hint_y=None,
@@ -74,7 +79,6 @@ class Buttons(BoxLayout):
         )
 
         self.add_widget(btn1)        
-        # TODO: Add function to display Tickets page
         btn1.bind(on_press=self.go_to_tickets)
         self.add_widget(btn2)
         btn2.bind(on_press=self.go_to_login)
@@ -83,12 +87,17 @@ class Buttons(BoxLayout):
         z_out.bind(on_press=self.zoom_out)
         self.add_widget(z_out)
 
+    #DISPLAYING USERID INFORMATION
     def get_user_text(self):
         app = App.get_running_app()
-        if hasattr(app, "user_data"):
+        if hasattr(app, "user_data") and app.user_data:
             u = app.user_data
-            return f"{u['username']} ({u['permit']})"
-        return "Guest (Visitor)"
+            name = u.get('username', 'User')
+            email = u.get('email', '')
+            permit = u.get('permit', 'No Permit')
+
+            return f"[b][size=40]{name}[/size][/b]\n{email}\n{permit}"
+        return "Guest\nNo Email\nVisitor"
 
     def refresh_user(self):
         self.user_label.text = self.get_user_text()
