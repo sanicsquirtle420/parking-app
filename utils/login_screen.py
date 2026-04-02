@@ -1,13 +1,13 @@
-from kivy.app import App
-from kivy.uix.screenmanager import Screen
 from kivy.uix.anchorlayout import AnchorLayout
+from database.queries.users import get_user
+from kivy.graphics import Color, Rectangle
+from kivy.uix.screenmanager import Screen
 from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.label import Label
 from kivy.uix.textinput import TextInput
 from kivy.uix.button import Button
-from kivy.graphics import Color, Rectangle
-from database.queries.users import get_user
-
+from kivy.uix.label import Label
+from kivy.app import App
+import bcrypt
 
 def red_button(text):
     default = (0.8, 0.1, 0.1, 1)
@@ -44,7 +44,7 @@ class LoginScreen(Screen):
         root.add_widget(Label(text="Ole Miss Parking", font_size=28, color=(1, 1, 1, 1), size_hint_y=None, height=52))
         root.add_widget(Label(text="Login", font_size=18, color=(0.7, 0.8, 1, 1), size_hint_y=None, height=30))
 
-        self.username = TextInput(hint_text="User ID", multiline=False, size_hint_y=None, height=48)
+        self.username = TextInput(hint_text="Email", multiline=False, size_hint_y=None, height=48)
         self.password = TextInput(hint_text="Password", password=True, multiline=False, size_hint_y=None, height=48)
         self.password.bind(on_text_validate=lambda *a: self.login(None))
 
@@ -86,7 +86,10 @@ class LoginScreen(Screen):
         if user is None:
             self.error.text = "User not found"
             return
-        if user["password_hash"] != self.password.text:
+        
+        usr_input = self.password.text.encode("utf-8")
+        hashed_passwd = user["password_hash"].encode("utf-8")
+        if not bcrypt.checkpw(usr_input, hashed_passwd):
             self.error.text = "Incorrect password"
             return
 

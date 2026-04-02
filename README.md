@@ -25,7 +25,7 @@ source venv311/bin/activate
 
 Dependencies:
 ```bash
-pip install kivy kivy_garden dotenv sshtunnel mariadb paramiko
+pip install kivy kivy_garden dotenv sshtunnel mariadb paramiko bcrypt
 ```
 
 Ubuntu / Debian
