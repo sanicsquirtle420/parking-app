@@ -8,6 +8,8 @@ from kivy.uix.spinner import Spinner, SpinnerOption
 from kivy.uix.button import Button
 from kivy.graphics import Color, Rectangle
 from kivy.lang import Builder
+from database.queries.users import create_user, gen_userid
+from database.queries.parking import add_user
 
 Builder.load_string('''
 <BorderedSpinnerOption@SpinnerOption>:
@@ -128,12 +130,25 @@ class CreateAccountScreen(Screen):
             self.email.text.strip(),
             self.password.text.strip(),
         ]):
-            self.msg.text = "Fill all fields"
+            self.msg.text = "Fill in all fields."
             return
 
         if self.permit_type.text == "Select Permit":
             self.msg.text = "Select a permit type"
             return
+        
+        user_id = gen_userid(self.permit_type.text)
+
+        create_user(
+            user_id=user_id,
+            first_name=self.first.text.strip(),
+            last_name=self.last.text.strip(),
+            email=self.email.text.strip(),
+            password=self.password.text.strip(),
+            role=self.permit_type.text
+        )
+
+        add_user(user_id, self.permit_type.text)
 
         App.get_running_app().user_data = {
             "username": self.email.text,
