@@ -6,8 +6,9 @@ from utils.lot_outlines import LotOutline
 from kivy.uix.boxlayout import BoxLayout
 from kivy_garden.mapview import MapView
 from utils.buttons import Buttons
-from utils.lot_cords import zones
+from kivy.config import Config
 from kivy.app import App
+import json
 
 class MainScreen(Screen):
     def __init__(self, **kwargs):
@@ -15,11 +16,30 @@ class MainScreen(Screen):
 
         root = BoxLayout(orientation="horizontal")
         map = MapView(zoom=15, lon=-89.538, lat=34.365, size_hint_x=0.75)
+        Config.set("graphics", "resizable", True)
 
-        for zone in zones:
-            for coords in zone["lots"]:
-                outline = LotOutline(coords, zone["color"])
-                map.add_layer(outline)
+        with open("utils/lot_cords.json") as f:
+            data = json.load(f)
+        lots = data["parking_lots"]
+
+        for lot in lots:
+            try:
+                outline = LotOutline(
+                    lot["coordinates"],
+                    tuple(lot["color"]),
+                    info = {
+                        "name": lot["name"],
+                        "capacity": 250,
+                        "permit_required": lot["permit"]
+                    }
+                )
+            except TypeError as e:
+                print(f"Bad lot: {lot.get('id')} - {lot.get('name')}")
+                print(f"  coordinates type: {type(lot.get('coordinates'))}")
+                print(f"  first coord: {lot['coordinates'][0] if lot.get('coordinates') else 'N/A'}")
+                raise
+
+            map.add_layer(outline)
 
         root.add_widget(map)
         root.add_widget(Buttons(map))
