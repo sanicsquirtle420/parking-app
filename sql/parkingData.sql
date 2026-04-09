@@ -40,26 +40,26 @@ INSERT INTO user_permits (user_id, permit_id, issued_date, expiration_date) VALU
 
 INSERT INTO parking_lots (lot_name, latitude, longitude, capacity, current_occupancy, ev_charger_count) VALUES
 -- Residential Northwest
-('Res NW - North Stockard/Martin', 34.371300, -89.537300, 120, 45, 2),
-('Res NW - South Stockard/Martin', 34.370100, -89.537200, 90, 30, 1),
+('North Stockard/Martin Lot', 34.371300, -89.537300, 120, 45, 2),
+('South Stockard/Martin Lot', 34.370100, -89.537200, 90, 30, 1),
 
 -- Residential Central
-('Res Central - Crosby', 34.370800, -89.534700, 110, 60, 2),
-('Res Central - Womens Terrace', 34.368600, -89.534800, 80, 50, 1),
+('Crosby Lot', 34.370800, -89.534700, 110, 60, 2),
+('Womens Terrace Lot', 34.368600, -89.534800, 80, 50, 1),
 
 -- Commuter Red
-('Commuter Red - Jackson Ave', 34.370200, -89.546800, 200, 120, 4),
-('Commuter Red - Jackson Annex', 34.369100, -89.546400, 100, 70, 2),
-('Commuter Red - South Campus Rec', 34.354100, -89.542200, 180, 90, 6),
-('Commuter Red - South Lot', 34.356900, -89.535500, 250, 150, 3),
-('Commuter Red - East Track', 34.358500, -89.536200, 140, 85, 2),
+('Jackson Avenue Lot', 34.370200, -89.546800, 200, 120, 4),
+('Jackson Annex Lot', 34.369100, -89.546400, 100, 70, 2),
+('South Campus Recreation Lot', 34.354100, -89.542200, 180, 90, 6),
+('South Lot', 34.356900, -89.535500, 250, 150, 3),
+('East Track Lot', 34.358500, -89.536200, 140, 85, 2),
 
 -- Commuter Blue
-('Commuter Blue - Ford Center 1', 34.365800, -89.527700, 130, 100, 2),
-('Commuter Blue - Ford Center 2', 34.366400, -89.528200, 160, 130, 3),
-('Commuter Blue - Music Building', 34.363400, -89.530400, 120, 95, 2),
-('Commuter Blue - Baseball North', 34.363200, -89.528800, 90, 60, 1),
-('Commuter Blue - Law School', 34.363700, -89.543000, 110, 75, 2),
+('Ford Center East Lot', 34.365800, -89.527700, 130, 100, 2),
+('Ford Center West Lot', 34.366400, -89.528200, 160, 130, 3),
+('Music Building Lot', 34.363400, -89.530400, 120, 95, 2),
+('Baseball North Lot', 34.363200, -89.528800, 90, 60, 1),
+('Law School Lot', 34.363700, -89.543000, 110, 75, 2),
 
 -- Residential Garage
 ('Residential Garage', 34.369700, -89.540200, 300, 210, 10);
