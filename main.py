@@ -1,4 +1,8 @@
+from utils.admin_lot_detail_screen import AdminLotDetailScreen
+from utils.admin_dashboard_screen import AdminDashboardScreen
+from utils.admin_analytics_screen import AdminAnalyticsScreen
 from utils.create_account_screen import CreateAccountScreen
+from utils.admin_permits_screen import AdminPermitsScreen
 from kivy.uix.screenmanager import ScreenManager, Screen
 from utils.tickets_screen import TicketsScreen
 from utils.login_screen import LoginScreen
@@ -66,6 +70,10 @@ class MainApp(App):
         sm.add_widget(CreateAccountScreen(name="create"))
         sm.add_widget(MainScreen(name="main"))
         sm.add_widget(TicketsScreen(name="tickets"))
+        sm.add_widget(AdminDashboardScreen(name="admin_dashboard"))
+        sm.add_widget(AdminLotDetailScreen(name="admin_lot_detail"))
+        sm.add_widget(AdminPermitsScreen(name="admin_permits"))
+        sm.add_widget(AdminAnalyticsScreen(name="admin_analytics"))
 
         return sm
 

@@ -86,7 +86,6 @@ class LoginScreen(Screen):
         if user is None:
             self.error.text = "User not found"
             return
-        
         usr_input = self.password.text.encode("utf-8")
         hashed_passwd = user["password_hash"].encode("utf-8")
         if not bcrypt.checkpw(usr_input, hashed_passwd):
@@ -99,11 +98,15 @@ class LoginScreen(Screen):
                 "user_id": user['user_id'],
                 "username": f"{user['first_name']} {user['last_name']}",
                 "email": user['email'],
+                "role": user["role"],
                 "permit": user.get('user_permit_name') or "No Permit Assigned"
             }
 
-        self.manager.current = "main"
-        self.manager.get_screen("main").refresh_sidebar()
+        if app.user_data["role"] == "admin":
+            self.manager.current = "admin_dashboard"
+        else:
+            self.manager.current = "main"
+            self.manager.get_screen("main").refresh_sidebar()
 
     def guest(self, instance):
         App.get_running_app().user_data = {
