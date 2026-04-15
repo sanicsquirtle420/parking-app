@@ -1,6 +1,7 @@
 from time import monotonic
 
 from kivy.graphics import Color, Rectangle
+from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
 from kivy.uix.label import Label
@@ -103,6 +104,16 @@ class AdminScreen(Screen):
 
     def navigate_to(self, target):
         if self.manager:
+            app = App.get_running_app()
+            if target == "main" and app.user_data.get("role") == "admin":
+                app.user_data = {
+                    "username": "Guest",
+                    "role": "Visitor",
+                    "permit": "Visitor",
+                }
+                self.manager.current = target
+                self.manager.get_screen("main").refresh_sidebar()
+                return
             self.manager.current = target
 
     def start_live_refresh(self, fetch_fn, apply_fn, show_loading_fn=None, force=False):
