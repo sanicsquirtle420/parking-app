@@ -25,7 +25,6 @@ Builder.load_string('''
             width: 1.1
 ''')
 
-
 def red_button(text):
     default = (0.8, 0.1, 0.1, 1)
     pressed = (0, 0, 0, 1)
@@ -91,7 +90,7 @@ class CreateAccountScreen(Screen):
 
         self.permit_type = Spinner(
             text="Select Permit",
-            values=("Student", "Faculty/Staff", "Visitor"),
+            values=("Student", "Faculty/Staff", "Visitor", "Admin"),
             size_hint_y=None,
             height=48,
             background_normal="",
@@ -139,14 +138,18 @@ class CreateAccountScreen(Screen):
         
         user_id = gen_userid(self.permit_type.text)
 
-        create_user(
+        juno = create_user(
             user_id=user_id,
             first_name=self.first.text.strip(),
             last_name=self.last.text.strip(),
             email=self.email.text.strip(),
             password=self.password.text.strip(),
-            role=self.permit_type.text
+            role=self.permit_type.text.strip().lower()
         )
+
+        if not juno:
+            self.msg.text = "A user is already using that email."
+            return
 
         add_user(user_id, self.permit_type.text)
 

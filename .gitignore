@@ -14,3 +14,4 @@ cache/
 icons/
 include/
 venv311/
+.kivy/

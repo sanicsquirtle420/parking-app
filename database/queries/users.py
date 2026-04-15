@@ -14,13 +14,20 @@ def create_user(user_id, first_name, last_name, email, password, role):
     passwd = bcrypt.hashpw(tmp, salt).decode("utf-8")
 
     try:
-        cursor.execute("""
-            INSERT INTO users (user_id, first_name, last_name, email, password_hash, role)
-            VALUES (%s, %s, %s, %s, %s, %s)
-        """, (user_id, first_name, last_name, email, passwd, role))
+        cursor.execute("SELECT * FROM users WHERE email = %s", (email,))
+        rows = cursor.fetchall()
 
-        conn.commit()
-        print("User created successfully")
+        if len(rows) > 0:
+            return False
+        else:
+            cursor.execute("""
+                INSERT INTO users (user_id, first_name, last_name, email, password_hash, role)
+                VALUES (%s, %s, %s, %s, %s, %s)
+            """, (user_id, first_name, last_name, email, passwd, role))
+
+            conn.commit()
+            print("User created successfully")
+            return True
 
     except Exception as e:
         conn.rollback()
