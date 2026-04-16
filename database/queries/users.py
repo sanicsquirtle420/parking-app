@@ -120,16 +120,51 @@ def gen_userid(permit):
     conn = get_connection()
     cursor = conn.cursor()
     permit = permit[:3].lower()
-
+    print(f"DEBUG: Looking for prefix '{permit}'")
+    new_id: str = ""
     try:
-        cursor.execute(f"SELECT user_id FROM users WHERE user_id LIKE \"{permit}%\"")
-        rows = cursor.fetchall()
-        count = len(rows) + 1
-        str_count = str(count) 
-        while len(str_count) != 3 :
-            str_count = "0" + str_count
-        print(f"USER ID: {permit}{str_count}")
-        return f"{permit}{str_count}"
+        cursor.execute(
+            "SELECT COUNT(*) FROM users WHERE user_id = %s",
+            (f"{permit}001",)
+        )
+        result = cursor.fetchone()
+        print(f"DEBUG: 001 check result: {result}")
+
+        if result[0] == 0:
+            new_id = f"{permit}001"
+        else:
+            cursor.execute("""
+                SELECT CONCAT(%s, LPAD(t.seq + 1, 3, '0')) AS next_id
+                FROM (
+                    SELECT CAST(SUBSTRING(user_id, 4) AS UNSIGNED) AS seq
+                    FROM users
+                    WHERE user_id LIKE %s
+                ) AS t
+                WHERE NOT EXISTS (
+                    SELECT 1 FROM users
+                    WHERE user_id = CONCAT(%s, LPAD(t.seq + 1, 3, '0'))
+                )
+                ORDER BY t.seq ASC
+                LIMIT 1
+            """, (permit, f"{permit}%", permit))
+
+            row = cursor.fetchone()
+            print(f"DEBUG: Gap query result: {row}")
+
+            if row is None:
+                cursor.execute("""
+                    SELECT CAST(SUBSTRING(user_id, 4) AS UNSIGNED) AS seq
+                    FROM users WHERE user_id LIKE %s
+                    ORDER BY seq DESC LIMIT 1
+                """, (f"{permit}%",))
+                max_row = cursor.fetchone()
+                print(f"DEBUG: Max row result: {max_row}")
+                new_id = f"{permit}{str(max_row[0] + 1).zfill(3)}"
+            else:
+                new_id = row[0]
+
+        print(f"USER ID: {new_id}")
+        return new_id
 
     except Exception as e:
         print("Error creating User ID: ", e)
