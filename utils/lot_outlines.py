@@ -4,6 +4,7 @@ from kivy.uix.floatlayout import FloatLayout
 from kivy_garden.mapview import MapLayer
 from kivy.core.window import Window
 from kivy.uix.label import Label
+from kivy.app import App
 
 class LotOutline(MapLayer):
     def __init__(self, coordinates, color: tuple, info: dict = None, **kwargs):
@@ -59,19 +60,32 @@ class LotOutline(MapLayer):
         if hasattr(self, '_tooltip') and self._tooltip:
             self.hide_tooltip()
 
+        app = App.get_running_app()
+        user_permit = app.user_data.get("permit")
+
         info = self.info
         text = f"[b]{info.get('name', 'Parking Lot')}[/b]\n"
         text += f"Capacity: {info.get('capacity', 'N/A')}\n"
-        text += f"Permit: {info.get('permit_required', 'N/A')}"
+        text += f"Permit: {info.get('permit_required', 'N/A')}\n"
+        if user_permit == info.get("permit_required", "N/A"):
+            text += "[color=00ff00]You can park here.[/color]"
+        else:
+            text += "[color=ff0000]You can not park here.[/color]"
 
         self._tooltip = Label(
             text=text,
             markup=True,
             size_hint=(None, None),
-            size=(220, 80),
-            pos=(pos[0] + 10, pos[1] - 80),
+            padding=(10, 8),
             color=(1, 1, 1, 1),
         )
+
+        self._tooltip.texture_update()
+        texture_w, texture_h = self._tooltip.texture_size
+
+        padding_x, padding_y = 15, 10
+        self._tooltip.size = (texture_w + padding_x, texture_h + padding_y)
+        self._tooltip.pos = (pos[0] + 10, pos[1] - self._tooltip.size[1] - 5)
 
         with self._tooltip.canvas.before:
             Color(0, 0, 0, 0.75)
@@ -86,11 +100,17 @@ class LotOutline(MapLayer):
             size=lambda inst, val: setattr(inst._bg_rect, 'size', val),
         )
 
-        self.get_root_window().add_widget(self._tooltip)
+        root_window = self.get_root_window()
+        if root_window is None:
+            return
+        root_window.add_widget(self._tooltip)
             
     def hide_tooltip(self):
         if hasattr(self, '_tooltip') and self._tooltip:
-            self.get_root_window().remove_widget(self._tooltip)
+            root_window = self.get_root_window()
+            if root_window is None:
+                return
+            root_window.remove_widget(self._tooltip)
             self._tooltip = None
 
 def point_in_lot(x, y, polygon):

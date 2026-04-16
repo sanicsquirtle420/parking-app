@@ -4,7 +4,7 @@ from collections import defaultdict
 
 KEY = "0001085cc708b9cef47080f064612ca5"
 MAP = "562"
-PARKING_CAT_IDS = {25384}
+PARKING_CAT_IDS = {27985, 27987}
 
 r = requests.get(f"https://api.concept3d.com/locations?map={MAP}&key={KEY}")
 data = r.json()
@@ -24,10 +24,10 @@ counter = 1
 for cat_id, lots in cat_lots.items():
     for name, coords in lots:
         lots_output.append({
-            "id": f"res_so{counter}",
+            "id": f"vis{counter}",
             "name": name,
-            "permit": "Residential South",        # adjust per lot/category as needed
-            "color": [1, 0.667, 0.231, 0.45],  # default white — change per lot
+            "permit": "Visitor",        # adjust per lot/category as needed
+            "color": [0.42, 0, 0.588, 0.45],  # default white — change per lot
             "coordinates": coords
         })
         counter += 1
