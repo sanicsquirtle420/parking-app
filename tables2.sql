@@ -1,16 +1,19 @@
+
+
 DROP TABLE IF EXISTS parking_occupancy_log;
 DROP TABLE IF EXISTS parking_rules;
 DROP TABLE IF EXISTS user_permits;
 DROP TABLE IF EXISTS parking_lots;
 DROP TABLE IF EXISTS permits;
 DROP TABLE IF EXISTS users;
-DROP TABLE IF EXISTS tickets;
+
 
 CREATE TABLE permits (
     permit_id VARCHAR(5) PRIMARY KEY,
     permit_name VARCHAR(50) NOT NULL,
     description VARCHAR(200)
 );
+
 
 CREATE TABLE users (
     user_id VARCHAR(20) PRIMARY KEY,
@@ -20,6 +23,7 @@ CREATE TABLE users (
     password_hash TEXT NOT NULL,
     role ENUM('student', 'faculty', 'visitor', 'admin') DEFAULT 'student'
 );
+
 
 CREATE TABLE user_permits (
     user_id VARCHAR(20),
@@ -31,6 +35,7 @@ CREATE TABLE user_permits (
     FOREIGN KEY (permit_id) REFERENCES permits(permit_id)
 );
 
+
 CREATE TABLE parking_lots (
     lot_id INT AUTO_INCREMENT PRIMARY KEY,
     lot_name VARCHAR(100) NOT NULL,
@@ -40,6 +45,7 @@ CREATE TABLE parking_lots (
     current_occupancy INT NOT NULL DEFAULT 0,
     ev_charger_count INT NOT NULL DEFAULT 0
 );
+
 
 CREATE TABLE parking_rules (
     rule_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -53,6 +59,7 @@ CREATE TABLE parking_rules (
     FOREIGN KEY (permit_id) REFERENCES permits(permit_id)
 );
 
+
 CREATE TABLE parking_occupancy_log (
     log_id INT AUTO_INCREMENT PRIMARY KEY,
     lot_id INT NOT NULL,
@@ -60,14 +67,4 @@ CREATE TABLE parking_occupancy_log (
     occupancy INT NOT NULL,
     ev_chargers_in_use INT NOT NULL DEFAULT 0,
     FOREIGN KEY (lot_id) REFERENCES parking_lots(lot_id)
-);
-
-CREATE TABLE tickets (
-    ticket_id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id VARCHAR(20) NOT NULL,
-    issue_date DATETIME DEFAULT CURRENT_TIMESTAMP,
-    amount DECIMAL(10,2) NOT NULL,
-    status ENUM('Unpaid', 'Pending', 'Paid') DEFAULT 'Unpaid',
-    description VARCHAR(255),
-    FOREIGN KEY (user_id) REFERENCES users(user_id)
 );

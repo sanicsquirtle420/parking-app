@@ -1,16 +1,36 @@
-# Default ignored files
-/shelf/
-/workspace.xml
+# ---- Python ----
 __pycache__/
-.vscode/
-.DS_Store/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+.pytest_cache/
+
+# ---- Virtual environments ----
+venv/
+env/
+.venv/
+ENV/
+
+# ---- Env files (secrets) ----
+.env
+.env.local
+*.env
+
+# ---- Editor / OS cruft ----
 .DS_Store
-**/.env
-.lnk
+Thumbs.db
 .idea/
-*.cfg
-bin/
-cache/
-icons/
-include/
-venv311/
+.vscode/
+*.swp
+*.swo
+
+# ---- Docker / MySQL data (if you ever mount it locally) ----
+mysql_data/
+
+# ---- Jupyter ----
+.ipynb_checkpoints/
+
+# ---- Logs ----
+*.log

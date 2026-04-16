@@ -1,0 +1,17 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: olemiss-parking
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: parking123
+      MYSQL_DATABASE: parking_db
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./tables2.sql:/docker-entrypoint-initdb.d/01_tables.sql:ro
+      - ./tables_data.sql:/docker-entrypoint-initdb.d/02_tables_data.sql:ro
+
+volumes:
+  mysql_data:
