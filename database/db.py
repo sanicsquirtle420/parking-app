@@ -31,20 +31,24 @@ def _init_pool():
         
         if _tunnel is None or not _tunnel.is_active:
             _tunnel = _get_tunnel()
+        kwargs = dict(
+            host="127.0.0.1",
+            user=DB_USER,
+            password=DB_PASSWORD,
+            database=DB_NAME,
+            port=_tunnel.local_bind_port,
+            pool_name = "387_pool",
+            pool_size = 5,
+            connect_timeout=5,
+            autocommit=False
+        )
         try:
-            pool = mariadb.ConnectionPool(
-                    host="127.0.0.1",
-                    user=DB_USER,
-                    password=DB_PASSWORD,
-                    database=DB_NAME,
-                    port=_tunnel.local_bind_port,
-                    pool_name = "387_pool",
-                    pool_size = 5,
-                    connect_timeout=5,
-                    autocommit=False
-                )
-        except mariadb.PoolError:
-            pool = mariadb.ConnectionPool(pool_name="387_pool")
+            stale = mariadb.ConnectionPool(pool_name="387_pool")
+            stale.close()
+            print("Closed stale pool from registry")
+        except Exception:
+            pass
+        pool = mariadb.ConnectionPool(**kwargs)
             
 class ManagedConnection:
     """Wrapper so existing code can keep calling conn.close()."""
@@ -89,12 +93,27 @@ def _get_tunnel():
 
         _tunnel = _start_tunnel()
         return _tunnel
+    
+def reset_pool():
+    global pool
+    with _pool_lock:
+        if pool is not None:
+            try:
+                pool.close()
+            except Exception:
+                pass
+            pool = None
 
 def get_connection():
     global pool
     if pool is None:
         _init_pool()
-    return ManagedConnection(pool.get_connection())
+    try:
+        return ManagedConnection(pool.get_connection())
+    except mariadb.PoolError:
+        reset_pool()
+        _init_pool()
+        return ManagedConnection(pool.get_connection())
 
 def run_in_background(fetch_fn, callback_fn):
     """Run fetch_fn in a daemon thread; deliver result to callback_fn on Kivy main thread."""
