@@ -48,37 +48,6 @@ def get_best_parking(user_id):
 
 def get_ranked_parking(user_id):
     lots = get_available_parking(user_id)
-    # Sort lots by spots left descending
     return sorted(lots, key=lambda x: x['spots_left'], reverse=True)
-
-def add_user(user_id, permit_type):
-    conn = get_connection()
-    cursor = conn.cursor(dictionary=True)
-    now = datetime.now()
-    current_day = now.strftime('%Y-%m-%d')
-    if permit_type == "Student":
-        permit = "S"
-    elif permit_type == "Faculty/Staff":
-        permit = "F"
-    elif permit_type == "Visitor":
-        permit = "V"
-    else:
-        print("Unknown permit type: ", permit_type)
-        return
-
-    try:
-        cursor.execute("""
-            INSERT INTO user_permits (user_id, permit_id, issued_date, expiration_date) 
-            VALUES(%s, %s, %s, %s)
-        """, (user_id, permit, current_day, "2026-07-31"))
-        conn.commit()
-        return 
-
-    except Exception as e:
-        conn.rollback()
-        print("Error adding user to permit_users:", e)
-        raise
-
-    finally:
-        cursor.close()
-        conn.close()
+    
+conn.close()
