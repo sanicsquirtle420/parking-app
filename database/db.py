@@ -18,38 +18,10 @@ DB_USER = os.getenv("DB_USER")
 DB_PASSWORD = os.getenv("DB_PASSWORD")
 DB_NAME = os.getenv("DB_NAME")
 
-_tunnel_lock = threading.Lock()
-_pool_lock = threading.Lock()
 _tunnel = None
-pool = None
+_tunnel_lock = threading.Lock()
 
-def _init_pool():
-    global _tunnel, pool
-    with _pool_lock:
-        if pool is not None:
-            return
-        
-        if _tunnel is None or not _tunnel.is_active:
-            _tunnel = _get_tunnel()
-        kwargs = dict(
-            host="127.0.0.1",
-            user=DB_USER,
-            password=DB_PASSWORD,
-            database=DB_NAME,
-            port=_tunnel.local_bind_port,
-            pool_name = "387_pool",
-            pool_size = 5,
-            connect_timeout=5,
-            autocommit=False
-        )
-        try:
-            stale = mariadb.ConnectionPool(pool_name="387_pool")
-            stale.close()
-            print("Closed stale pool from registry")
-        except Exception:
-            pass
-        pool = mariadb.ConnectionPool(**kwargs)
-            
+
 class ManagedConnection:
     """Wrapper so existing code can keep calling conn.close()."""
     def __init__(self, conn):
@@ -66,17 +38,17 @@ class ManagedConnection:
 
 
 def _start_tunnel():
-    t = SSHTunnelForwarder(
+    tunnel = SSHTunnelForwarder(
         (SSH_HOST, SSH_PORT),
         ssh_username=SSH_USER,
         ssh_password=SSH_PASSWORD,
         remote_bind_address=(DB_HOST, DB_PORT),
         local_bind_address=("127.0.0.1", 0),
     )
-    t.daemon_forward_servers = True
-    t.start()
-    print(f"SSH tunnel established on local port {t.local_bind_port}")
-    return t
+    tunnel.daemon_forward_servers = True
+    tunnel.start()
+    print(f"SSH tunnel established on local port {tunnel.local_bind_port}")
+    return tunnel
 
 
 def _get_tunnel():
@@ -93,27 +65,21 @@ def _get_tunnel():
 
         _tunnel = _start_tunnel()
         return _tunnel
-    
-def reset_pool():
-    global pool
-    with _pool_lock:
-        if pool is not None:
-            try:
-                pool.close()
-            except Exception:
-                pass
-            pool = None
+
 
 def get_connection():
-    global pool
-    if pool is None:
-        _init_pool()
-    try:
-        return ManagedConnection(pool.get_connection())
-    except mariadb.PoolError:
-        reset_pool()
-        _init_pool()
-        return ManagedConnection(pool.get_connection())
+    tunnel = _get_tunnel()
+    conn = mariadb.connect(
+        user=DB_USER,
+        password=DB_PASSWORD,
+        host="127.0.0.1",
+        port=tunnel.local_bind_port,
+        database=DB_NAME,
+        connect_timeout=5,
+        autocommit=False,
+    )
+    return ManagedConnection(conn)
+
 
 def run_in_background(fetch_fn, callback_fn):
     """Run fetch_fn in a daemon thread; deliver result to callback_fn on Kivy main thread."""

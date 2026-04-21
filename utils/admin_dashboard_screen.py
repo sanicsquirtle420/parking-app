@@ -4,9 +4,10 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
 from kivy.uix.label import Label
 from kivy.uix.scrollview import ScrollView
-
 from database.queries.admin_dashboard import get_all_lots
 from utils.admin_navigation import AdminScreen
+from kivy.clock import Clock
+import threading
 
 
 OM_RED = (0.816, 0.125, 0.176, 1)
@@ -92,8 +93,8 @@ class AdminDashboardScreen(AdminScreen):
         root.add_widget(main)
         self.add_widget(root)
 
-    def on_pre_enter(self):
-        self.load_data(force=True)
+    def on_enter(self):
+        Clock.schedule_once(lambda dt: self.load_data(), 0.2)
 
     def _set_loading_state(self, is_loading, is_refresh):
         if is_loading:
@@ -130,13 +131,28 @@ class AdminDashboardScreen(AdminScreen):
         for lot in lots:
             self.lots_box.add_widget(self.build_lot_card(lot))
 
+    def _bg_load_lots(self):
+        try:
+            lots = get_all_lots()  # This is the slow MySQL call
+            Clock.schedule_once(lambda dt: self._apply_lots(lots))
+        except Exception as e:
+            print(f"Database Error: {e}")
+            Clock.schedule_once(lambda dt: self._apply_lots(None))
+        finally:
+            Clock.schedule_once(lambda dt: self._set_loading_state(False, False)) 
+
+    def _finish_load(self, data):
+        self.rv.data = data
+        self._set_loading_state(False, False)
+
     def load_data(self, force=False):
-        self.start_live_refresh(
-            get_all_lots,
-            self._apply_lots,
-            self._set_loading_state,
-            force=force,
-        )
+        self._set_loading_state(True, force)
+
+        def worker():
+            data = get_all_lots()
+            Clock.schedule_once(lambda dt: self._finish_load(data))
+
+        threading.Thread(target=worker, daemon=True).start()
 
     def build_lot_card(self, lot):
         card = BoxLayout(
