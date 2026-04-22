@@ -1,14 +1,12 @@
-from time import monotonic
-
 from kivy.graphics import Color, Rectangle
-from kivy.app import App
+from database.db import run_in_background
+from kivy.uix.screenmanager import Screen
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
 from kivy.uix.label import Label
-from kivy.uix.screenmanager import Screen
-
-from database.db import run_in_background
-
+from kivy.clock import Clock
+from time import monotonic
+from kivy.app import App
 
 ADMIN_NAV_ITEMS = [
     ("admin_dashboard", "Dashboard"),
@@ -30,6 +28,7 @@ class AdminScreen(Screen):
         self._refresh_dirty = True
         self._last_refresh_completed_at = None
         self.live_refresh_interval = 10.0
+        self._live_refresh_clock = None
 
         with self.canvas.before:
             Color(*LIGHT_BG)
@@ -40,6 +39,25 @@ class AdminScreen(Screen):
     def _update_bg(self, *_):
         self._bg_rect.pos = self.pos
         self._bg_rect.size = self.size
+
+    def on_enter(self, *args):
+        pass
+
+    def on_leave(self, *args):
+        if self._live_refresh_clock:
+            self._live_refresh_clock.cancel()
+            self._live_refresh_clock = None
+
+        self._refresh_in_flight = False
+        self._refresh_active_token = None
+
+    def schedule_refresh(self, delay, fetch_fn, apply_fn, show_loading_fn=None, force=False):
+        if self._live_refresh_clock:
+            self._live_refresh_clock.cancel()
+        self._live_refresh_clock = Clock.schedule_once(
+            lambda dt: self.start_live_refresh(fetch_fn, apply_fn, show_loading_fn, force),
+            delay,
+        )
 
     def build_admin_sidebar(
         self,
@@ -103,18 +121,19 @@ class AdminScreen(Screen):
         return button
 
     def navigate_to(self, target):
-        if self.manager:
-            app = App.get_running_app()
-            if target == "main" and app.user_data.get("role") == "admin":
-                app.user_data = {
-                    "username": "Guest",
-                    "role": "Visitor",
-                    "permit": "Visitor",
-                }
-                self.manager.current = target
-                self.manager.get_screen("main").refresh_sidebar()
-                return
+        if not self.manager:
+            return
+        app = App.get_running_app()
+        if target == "main" and app.user_data.get("role") == "admin":
+            app.user_data = {
+                "username": "Guest",
+                "role": "Visitor",
+                "permit": "Visitor",
+            }
             self.manager.current = target
+            self.manager.get_screen("main").refresh_sidebar()
+            return
+        self.manager.current = target
 
     def start_live_refresh(self, fetch_fn, apply_fn, show_loading_fn=None, force=False):
         if self._refresh_in_flight:
@@ -138,6 +157,8 @@ class AdminScreen(Screen):
         self._refresh_active_token = token
 
         def _deliver(result):
+            if token != self._refresh_active_token:
+                return
             self._finish_refresh(token, result, apply_fn, show_loading_fn)
 
         run_in_background(fetch_fn, _deliver)
@@ -176,14 +197,9 @@ class AdminScreen(Screen):
     def invalidate_admin_screen(self, screen_name):
         if not self.manager or not self.manager.has_screen(screen_name):
             return
-
         screen = self.manager.get_screen(screen_name)
         if hasattr(screen, "invalidate_live_data"):
             screen.invalidate_live_data()
-
-    def on_leave(self, *args):
-        self._refresh_in_flight = False
-        self._refresh_active_token = None
 
     def update_rect(self, instance, _value):
         if hasattr(instance, "rect"):

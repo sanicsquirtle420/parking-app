@@ -12,7 +12,11 @@ from kivy_garden.mapview import MapView
 from utils.buttons import Buttons
 from kivy.config import Config
 from kivy.app import App
+import signal 
 import json
+import os
+
+signal.signal(signal.SIGINT, signal.SIG_DFL)
 
 class MainScreen(Screen):
     def __init__(self, **kwargs):
@@ -56,6 +60,9 @@ class MainScreen(Screen):
 
 
 class MainApp(App):
+    def on_stop(self):
+        os.kill(os.getpid(), signal.SIGKILL)
+
     def build(self):
         self.title = "University of Mississippi Parking App"
 
