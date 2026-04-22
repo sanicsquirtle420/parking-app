@@ -20,10 +20,10 @@ Nothing in those project folders was modified to create this package.
 
 ## Files
 
-- `01_schema.sql`: core schema
-- `02_seed_reference.sql`: permits, demo users, active permit assignments
-- `03_seed_lots_and_rules.sql`: 277 campus lot polygons transformed into database rows, plus rules, occupancy history, and sample tickets
-- `04_views.sql`: helper views for analytics/reporting
+- `schema.sql`: core schema
+- `seed_reference.sql`: permits, demo users, active permit assignments
+- `seed_lots_and_rules.sql`: 277 campus lot polygons transformed into database rows, plus rules, occupancy history, and sample tickets
+- `views.sql`: helper views for analytics/reporting
 - `TEST_LOGINS.md`: plaintext demo credentials for team testing
 - `hash_password.py`: tiny bcrypt helper for creating more hashes later
 
