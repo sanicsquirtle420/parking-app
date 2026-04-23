@@ -184,6 +184,7 @@ class AdminDashboardScreen(AdminScreen):
         return card
 
     def on_enter(self):
+        self.refresh_sidebar()
         if self._all_lots:
             self._refresh_page()
         Clock.schedule_once(lambda dt: self.load_data(), 0.2)

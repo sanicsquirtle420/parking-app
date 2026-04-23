@@ -95,16 +95,15 @@ class LoginScreen(Screen):
         app = App.get_running_app()
 
         app.user_data = {
-            "user_id": user['user_id'],
-            "username": f"{user['first_name']} {user['last_name']}",
-            "email": user['email'],
-            "role": user["role"],
-            "permit": user.get('user_permit_name', 'No Permit')
-        }
+                "user_id": user['user_id'],
+                "username": f"{user['first_name']} {user['last_name']}",
+                "email": user['email'],
+                "role": user["role"],
+                "permit": user.get('user_permit_name') or "No Permit Assigned"
+            }
 
         if app.user_data["role"] == "admin":
             self.manager.current = "admin_dashboard"
-            self.manager.get_screen("admin_dashboard").refresh_sidebar()
         else:
             self.manager.current = "main"
             self.manager.get_screen("main").refresh_sidebar()
