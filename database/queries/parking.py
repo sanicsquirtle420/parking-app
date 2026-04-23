@@ -57,16 +57,17 @@ def add_user(user_id, permit_type):
     now = datetime.now()
     current_day = now.strftime('%Y-%m-%d')
     if permit_type == "Student":
-        permit = "S"
+        permit = "RC"
     elif permit_type == "Faculty/Staff":
-        permit = "F"
+        permit = "FS"
     elif permit_type == "Visitor":
-        permit = "V"
+        permit = "VSD"
     else:
         print("Unknown permit type: ", permit_type)
         return
 
     try:
+        
         cursor.execute("""
             INSERT INTO user_permits (user_id, permit_id, issued_date, expiration_date) 
             VALUES(%s, %s, %s, %s)

@@ -3,9 +3,10 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.label import Label
 from kivy.uix.scrollview import ScrollView
-
 from database.queries.admin_analytics import get_analytics_data
 from utils.admin_navigation import AdminScreen
+import threading
+from kivy.clock import Clock
 
 
 OM_RED = (0.816, 0.125, 0.176, 1)
@@ -93,12 +94,12 @@ class AdminAnalyticsScreen(AdminScreen):
         root.add_widget(main)
         self.add_widget(root)
 
-    def on_pre_enter(self):
-        self.start_live_refresh(
+    def on_enter(self):
+        Clock.schedule_once(lambda dt: self.start_live_refresh(
             get_analytics_data,
             self._apply_data,
             self._set_loading_state
-        )
+        ), 0.2)
 
     def _set_loading_state(self, is_loading, is_refresh):
         if is_loading:
@@ -112,57 +113,36 @@ class AdminAnalyticsScreen(AdminScreen):
             return
 
         overview = data["overview"]
-
         self.total_lots_label.text = str(overview["total_lots"] or 0)
         self.critical_lots_label.text = str(overview["critical_lots"] or 0)
         self.avg_util_label.text = f"{overview['avg_utilization'] or 0}%"
         self.no_ev_label.text = str(overview["no_ev"] or 0)
 
+        # Clear existing
         self.peak_box.clear_widgets()
-        if data["peak"]:
-            for p in data["peak"]:
-                self.peak_box.add_widget(Label(
-                    text=f"Lot {p['lot_id']}: Peak {p['peak_occupancy']}",
-                    color=TEXT_DARK,
-                    halign="left",
-                    valign="middle",
-                    size_hint_y=None,
-                    height=30
-                ))
-
         self.ev_box.clear_widgets()
-        if data["ev"]:
-            for e in data["ev"]:
-                self.ev_box.add_widget(Label(
-                    text=f"{e['lot_name']} - Chargers: {e['ev_charger_count']}",
-                    color=TEXT_DARK,
-                    halign="left",
-                    valign="middle",
-                    size_hint_y=None,
-                    height=30
-                ))
-
         self.overloaded_box.clear_widgets()
-        for l in data["overloaded"]:
-            self.overloaded_box.add_widget(Label(
-                text=f"{l['lot_name']} ({l['utilization']}%)",
-                color=(1, 0, 0, 1),
-                halign="left",
-                valign="middle",
-                size_hint_y=None,
-                height=30
+        self.underutilized_box.clear_widgets()
+
+        # Helper to add widgets without freezing the UI
+        def add_item(box, text, color):
+            box.add_widget(Label(
+                text=text, color=color, halign="left", valign="middle",
+                size_hint_y=None, height=30
             ))
 
-        self.underutilized_box.clear_widgets()
-        for l in data["underutilized"]:
-            self.underutilized_box.add_widget(Label(
-                text=f"{l['lot_name']} ({l['utilization']}%)",
-                color=(0, 0.6, 0, 1),
-                halign="left",
-                valign="middle",
-                size_hint_y=None,
-                height=30
-            ))
+        # Add data (If these lists are very long, this loop is the bottleneck)
+        for p in data.get("peak", []):
+            add_item(self.peak_box, f"Lot {p['lot_id']}: Peak {p['peak_occupancy']}", TEXT_DARK)
+
+        for e in data.get("ev", []):
+            add_item(self.ev_box, f"{e['lot_name']} - Chargers: {e['ev_charger_count']}", TEXT_DARK)
+
+        for l in data.get("overloaded", []):
+            add_item(self.overloaded_box, f"{l['lot_name']} ({l['utilization']}%)", RED)
+
+        for l in data.get("underutilized", []):
+            add_item(self.underutilized_box, f"{l['lot_name']} ({l['utilization']}%)", GREEN)
 
     def build_overview_section(self):
         section = BoxLayout(
@@ -284,3 +264,17 @@ class AdminAnalyticsScreen(AdminScreen):
         card.bind(pos=self.update_rect, size=self.update_rect)
 
         return card
+    
+    def on_pre_enter(self):
+        self._set_loading_state(True, False)
+        threading.Thread(target=self._bg_load_data, daemon=True).start()
+
+    def _bg_load_data(self):
+        try:
+            data = get_analytics_data()
+            Clock.schedule_once(lambda dt: self._apply_data(data))
+        except Exception as e:
+            print(f"Background load error: {e}")
+        finally:
+            Clock.schedule_once(lambda dt: self._set_loading_state(False, True))
+
