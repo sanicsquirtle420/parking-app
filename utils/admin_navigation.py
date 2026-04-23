@@ -161,7 +161,8 @@ class AdminScreen(Screen):
                 return
             self._finish_refresh(token, result, apply_fn, show_loading_fn)
 
-        run_in_background(fetch_fn, _deliver)
+        # Use the screen name as the key so each screen deduplicates independently
+        run_in_background(fetch_fn, _deliver, task_key=self.name)
 
     def _finish_refresh(self, token, result, apply_fn, show_loading_fn):
         if token != self._refresh_active_token:
@@ -171,20 +172,25 @@ class AdminScreen(Screen):
         self._refresh_in_flight = False
         self._refresh_active_token = None
 
-        if token == latest_token:
-            if result is not None:
-                self._refresh_dirty = False
-                self._last_refresh_completed_at = monotonic()
+        def _on_main_thread(dt):
+            if token == latest_token:
+                if result is not None:
+                    self._refresh_dirty = False
+                    self._last_refresh_completed_at = monotonic()
 
+                if show_loading_fn:
+                    show_loading_fn(False, False)
+
+                apply_fn(result)
+                return
+
+            # A newer request came in while this one was in flight
             if show_loading_fn:
-                show_loading_fn(False, False)
+                show_loading_fn(True, True)
+            self._launch_refresh(latest_token)
 
-            apply_fn(result)
-            return
-
-        if show_loading_fn:
-            show_loading_fn(True, True)
-        self._launch_refresh(latest_token)
+        # Always deliver to the main thread
+        Clock.schedule_once(_on_main_thread, 0)
 
     def has_fresh_data(self):
         if self._refresh_dirty or self._last_refresh_completed_at is None:

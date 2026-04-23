@@ -5,110 +5,25 @@ from kivy.uix.button import Button
 from kivy.uix.label import Label
 from kivy.uix.scrollview import ScrollView
 from database.queries.admin_dashboard import get_all_lots
+from database.db import run_in_background
 from utils.admin_navigation import AdminScreen
 from kivy.clock import Clock
-import threading
 from kivy.uix.recycleview import RecycleView
 from kivy.uix.recycleview.views import RecycleDataViewBehavior
 from kivy.uix.recycleboxlayout import RecycleBoxLayout
-from kivy.properties import StringProperty, NumericProperty
-from kivy.uix.recycleview.views import RecycleDataViewBehavior
+from kivy.properties import StringProperty
+import math
 
 OM_RED = (0.816, 0.125, 0.176, 1)
 LIGHT_BG = (0.96, 0.97, 0.98, 1)
-CARD_BG = (1, 1, 1, 1)
 TEXT_DARK = (0.1, 0.1, 0.1, 1)
 TEXT_MUTED = (0.35, 0.35, 0.35, 1)
-
-class LotCard(RecycleDataViewBehavior, BoxLayout):
-    lot_text = StringProperty("")
-    
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.orientation = "horizontal"
-        self.size_hint_y = None
-        self.height = 80
-        self.padding = 12
-        self.spacing = 10
-        self.details.shorten = True
-        self.details.max_lines = 5
-
-        # with self.canvas.before:
-        #     Color(*CARD_BG)
-        #     self.rect = Rectangle(pos=self.pos, size=self.size)
-        # self.bind(pos=self._update_rect, size=self._update_rect)
-
-        self.details = Label(
-            markup=False,
-            color=TEXT_DARK,
-            halign="left",
-            valign="middle",
-        )
-
-        self.details.bind(size=lambda inst, val: setattr(inst, "text_size", val))
-
-        self.bind(lot_text=self.details.setter('text'))
-
-        self.manage_btn = Button(
-            text="Manage Lot",
-            size_hint_x=None,
-            width=140,
-            background_normal="",
-            background_color=OM_RED,
-        )
-
-        self.manage_btn.bind(on_release=self.on_manage_press)
-
-        self.add_widget(self.details)
-        self.add_widget(self.manage_btn)
-
-    def _update_rect(self, *args):
-        self.rect.pos = self.pos
-        self.rect.size = self.size
-
-    def refresh_view_attrs(self, rv, index, data):
-        self.index = index 
-        utilization = data.get("utilization_pct", 0)
-        
-        self.lot_text = (
-            f"{data['lot_name']}\n"
-            f"Occupancy: {data['current_occupancy']} / {data['capacity']} ({utilization}%)\n"
-            f"EV Chargers: {data['ev_charger_count']}"
-        )
-        return super().refresh_view_attrs(rv, index, data)
-
-    def on_manage_press(self, instance):
-        app = App.get_running_app()
-        rv = self.parent.recycleview
-        lot_data = rv.data[self.index]
-        app.root.get_screen("admin_dashboard").open_lot_detail(lot_data)
-
-    def on_touch_up(self, touch):
-        if self.collide_point(*touch.pos):
-            self.on_manage_press(None)
-            return True
-        return super().on_touch_up(touch)
-        
-class LotsRecycleView(RecycleView):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.viewclass = LotCard
-        layout = RecycleBoxLayout(
-            orientation="vertical",
-            spacing=10,
-            default_size=(None, 108),
-            default_size_hint=(1, None),
-            size_hint_y=None,
-        )
-        
-        layout.bind(minimum_height=layout.setter('height'))
-        self.layout_manager = layout
-        self.add_widget(layout) 
-        self.data = []   
 
 class AdminDashboardScreen(AdminScreen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        # Token used to cancel stale page-change deferred calls
+        self._page_token = 0
 
         root = BoxLayout(orientation="horizontal")
 
@@ -118,7 +33,6 @@ class AdminDashboardScreen(AdminScreen):
         )
 
         main = BoxLayout(orientation="vertical", padding=20, spacing=12)
-
         with main.canvas.before:
             Color(*LIGHT_BG)
             main.rect = Rectangle(pos=main.pos, size=main.size)
@@ -131,17 +45,14 @@ class AdminDashboardScreen(AdminScreen):
             height=50,
             color=TEXT_DARK,
         ))
-
-        subtitle = Label(
+        main.add_widget(Label(
             text="Live lot occupancy and capacity overview",
             size_hint_y=None,
             height=28,
             color=TEXT_MUTED,
             halign="left",
             valign="middle",
-        )
-        subtitle.bind(size=self.update_label_text_size)
-        main.add_widget(subtitle)
+        ))
 
         self.status_label = Label(
             text="",
@@ -151,7 +62,6 @@ class AdminDashboardScreen(AdminScreen):
             halign="left",
             valign="middle",
         )
-        self.status_label.bind(size=self.update_label_text_size)
         main.add_widget(self.status_label)
 
         controls = BoxLayout(size_hint_y=None, height=45, spacing=10)
@@ -164,65 +74,159 @@ class AdminDashboardScreen(AdminScreen):
         )
         refresh_btn.bind(on_release=lambda *_: self.load_data(force=True))
         controls.add_widget(refresh_btn)
-        controls.add_widget(Label())
         main.add_widget(controls)
 
-        self.rv = LotsRecycleView()
-        main.add_widget(self.rv)
+        self._all_lots = []
+        self._page = 0
+        self._page_size = 15
+
+        self.cards_box = BoxLayout(
+            orientation="vertical",
+            size_hint_y=None,
+            spacing=10,
+            padding=5,
+        )
+        self.cards_box.bind(minimum_height=self.cards_box.setter("height"))
+
+        scroll = ScrollView(size_hint=(1, 1))
+        scroll.add_widget(self.cards_box)
+        main.add_widget(scroll)
+
+        self.pagination_bar = self._build_pagination_bar()
+        main.add_widget(self.pagination_bar)
 
         root.add_widget(sidebar)
         root.add_widget(main)
         self.add_widget(root)
 
+    def _build_pagination_bar(self):
+        bar = BoxLayout(size_hint_y=None, height=40, spacing=10)
+        self.prev_btn = Button(
+            text="Previous",
+            size_hint_x=None,
+            width=120,
+            background_normal="",
+            background_color=OM_RED,
+        )
+        self.prev_btn.bind(on_release=lambda *_: self._go_page(self._page - 1))
+        self.page_label = Label(text="", color=TEXT_DARK)
+        self.next_btn = Button(
+            text="Next",
+            size_hint_x=None,
+            width=120,
+            background_normal="",
+            background_color=OM_RED,
+        )
+        self.next_btn.bind(on_release=lambda *_: self._go_page(self._page + 1))
+        bar.add_widget(self.prev_btn)
+        bar.add_widget(self.page_label)
+        bar.add_widget(self.next_btn)
+        return bar
+
+    def _go_page(self, page):
+        total_pages = self._total_pages()
+        if total_pages == 0:
+            return
+        self._page = max(0, min(page, total_pages - 1))
+        self._refresh_page()
+
+    def _total_pages(self):
+        return math.ceil(len(self._all_lots) / self._page_size) if self._all_lots else 0
+
+    def _refresh_page(self):
+        self._page_token += 1
+
+        start = self._page * self._page_size
+        end = start + self._page_size
+        page_slice = self._all_lots[start:end]
+
+        total_pages = self._total_pages()
+        self.page_label.text = f"Page {self._page + 1} of {total_pages}"
+        self.prev_btn.disabled = (self._page == 0)
+        self.next_btn.disabled = (self._page >= total_pages - 1)
+
+        self.cards_box.clear_widgets()
+        for lot in page_slice:
+            self.cards_box.add_widget(self._make_card(lot))
+
+    def _make_card(self, lot):
+        utilization = float(lot.get("utilization_pct", 0))
+        card = BoxLayout(
+            orientation="horizontal",
+            size_hint_y=None,
+            height=108,
+            padding=12,
+            spacing=10,
+        )
+        with card.canvas.before:
+            Color(1, 1, 1, 1)
+            rect = Rectangle(pos=card.pos, size=card.size)
+        card.bind(pos=lambda inst, val, r=rect: setattr(r, "pos", val))
+        card.bind(size=lambda inst, val, r=rect: setattr(r, "size", val))
+
+        details = Label(
+            text=(
+                f"{lot['lot_name']}\n"
+                f"Occupancy: {lot['current_occupancy']} / {lot['capacity']} ({utilization}%)\n"
+                f"EV Chargers: {lot['ev_charger_count']}"
+            ),
+            color=TEXT_DARK,
+            halign="left",
+            valign="middle",
+            size_hint_x=0.8,
+        )
+        details.bind(size=lambda inst, val: setattr(inst, "text_size", val))
+
+        btn = Button(
+            text="Manage Lot",
+            size_hint_x=None,
+            width=140,
+            background_normal="",
+            background_color=OM_RED,
+        )
+        btn.bind(on_release=lambda *_, l=lot: self.open_lot_detail(l))
+
+        card.add_widget(details)
+        card.add_widget(btn)
+        return card
+
     def on_enter(self):
+        if self._all_lots:
+            self._refresh_page()
         Clock.schedule_once(lambda dt: self.load_data(), 0.2)
 
     def _set_loading_state(self, is_loading, is_refresh):
         if is_loading:
             self.status_label.text = "Refreshing lots..." if is_refresh else "Loading lots..."
-            return
-        if self.status_label.text.startswith(("Loading", "Refreshing")):
+        elif self.status_label.text.startswith(("Loading", "Refreshing")):
             self.status_label.text = ""
 
-    def _apply_lots(self, lots):
-        if lots is None:
-            self.status_label.text = "Unable to load parking lots."
-            self.rv.data = []
-            return
-
-        self.rv.data = []
-        self._lot_chunks = [lots[i:i+30] for i in range(0, len(lots), 30)]
-        self._load_next_chunk()
-
-    def _load_next_chunk(self, dt=0):
-        if not self._lot_chunks:
-            return
-
-        chunk = self._lot_chunks.pop(0)
-
-        new_data = self.rv.data + chunk
-        self.rv.data = new_data
-
-        Clock.schedule_once(self._load_next_chunk, 0.02)
-
-    def _bg_load_lots(self):
-        import time
-        start = time.time()
-        try:
-            lots = get_all_lots()
-            Clock.schedule_once(lambda dt: self._apply_lots(lots))
-        except Exception as e:
-            print(f"Database Error: {e}")
-            Clock.schedule_once(lambda dt: self._apply_lots(None))
-        finally:
-            print(f"Lot load time: {time.time() - start:.2f} seconds")
-            Clock.schedule_once(lambda dt: self._set_loading_state(False, False))
-
     def load_data(self, force=False):
-        self._set_loading_state(True, force)
-        threading.Thread(target=self._bg_load_lots, daemon=True).start()
+        self.start_live_refresh(
+            get_all_lots,
+            self._apply_lots,
+            self._set_loading_state,
+            force=True,
+        )
+
+    def _apply_lots(self, lots):
+        import threading
+        # FIX: this is called on the main thread by _finish_refresh, so direct UI access is safe
+        self._set_loading_state(False, False)
+        print(f"DEBUG _apply_lots thread: {threading.current_thread().name}")
+
+        if lots is None:
+            self.rv.data = []
+            self._all_lots = []
+            self.page_label.text = ""
+            return
+
+        self._all_lots = lots
+        self._page = 0
+        self._refresh_page()
+        print(f"DEBUG: loaded {len(lots)} lots")
 
     def open_lot_detail(self, lot):
-        self.manager.selected_admin_lot = lot
         if self.manager:
+            self.manager.selected_admin_lot = lot
             self.manager.current = "admin_lot_detail"
