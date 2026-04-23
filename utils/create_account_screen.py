@@ -8,8 +8,7 @@ from kivy.uix.spinner import Spinner, SpinnerOption
 from kivy.uix.button import Button
 from kivy.graphics import Color, Rectangle
 from kivy.lang import Builder
-from database.queries.users import create_user, gen_userid
-from database.queries.parking import add_user
+from database.queries.users import create_user, gen_userid, add_user, get_permit_types
 
 Builder.load_string('''
 <BorderedSpinnerOption@SpinnerOption>:
@@ -88,9 +87,21 @@ class CreateAccountScreen(Screen):
         self.email = field("Email")
         self.password = field("Password", True)
 
+        self.role_type = Spinner(
+            text="Select Role",
+            values=("Student", "Faculty/Staff"),
+            size_hint_y=None,
+            height=48,
+            background_normal="",
+            background_color=(0.3, 0.3, 0.3, 1),
+            color=(1, 1, 1, 1),
+            option_cls="BorderedSpinnerOption",
+        )
+        self.role_type.bind(text=self.update_permit_options)
+
         self.permit_type = Spinner(
             text="Select Permit",
-            values=("Student", "Faculty/Staff", "Visitor", "Admin"),
+            values=(),
             size_hint_y=None,
             height=48,
             background_normal="",
@@ -99,7 +110,7 @@ class CreateAccountScreen(Screen):
             option_cls="BorderedSpinnerOption",
         )
 
-        for w in [self.first, self.last, self.email, self.password, self.permit_type]:
+        for w in [self.first, self.last, self.email, self.password, self.role_type, self.permit_type]:
             root.add_widget(w)
 
         create_btn = red_button("Create Account")
@@ -122,6 +133,24 @@ class CreateAccountScreen(Screen):
         self.rect.size = self.size
         self.rect.pos = self.pos
 
+    def update_permit_options(self, spinner, text):
+        all_permits = get_permit_types()
+        
+        if text == "Student":
+            self.permit_type.values = [
+                p for p in all_permits 
+                if "visitor" not in p.lower() and "faculty" not in p.lower() and "staff" not in p.lower()
+            ]
+        elif text == "Faculty/Staff":
+            self.permit_type.values = [
+                p for p in all_permits 
+                if "faculty" in p.lower() or "staff" in p.lower()
+            ]
+        elif text == "Admin":
+            self.permit_type.values = all_permits
+            
+        self.permit_type.text = "Select Permit"
+
     def create(self, instance):
         if not all([
             self.first.text.strip(),
@@ -132,10 +161,20 @@ class CreateAccountScreen(Screen):
             self.msg.text = "Fill in all fields."
             return
 
+        if self.role_type.text == "Select Role":
+            self.msg.text = "Select a role"
+            return
+
         if self.permit_type.text == "Select Permit":
             self.msg.text = "Select a permit type"
             return
         
+        role_map = {
+            "Student": "student",
+            "Faculty/Staff": "faculty",
+            "Admin": "admin"
+        }
+        db_role = role_map.get(self.role_type.text, "student")
         user_id = gen_userid(self.permit_type.text)
 
         juno = create_user(
@@ -144,7 +183,7 @@ class CreateAccountScreen(Screen):
             last_name=self.last.text.strip(),
             email=self.email.text.strip(),
             password=self.password.text.strip(),
-            role=self.permit_type.text.strip().lower()
+            role=db_role
         )
 
         if not juno:
@@ -154,8 +193,10 @@ class CreateAccountScreen(Screen):
         add_user(user_id, self.permit_type.text)
 
         App.get_running_app().user_data = {
-            "username": self.email.text,
-            "role": self.permit_type.text,
+            "user_id": user_id,
+            "username": f"{self.first.text.strip()} {self.last.text.strip()}",
+            "email": self.email.text.strip(),
+            "role": db_role,
             "permit": self.permit_type.text,
         }
 
@@ -170,5 +211,7 @@ class CreateAccountScreen(Screen):
         self.last.text = ""
         self.email.text = ""
         self.password.text = ""
+        self.role_type.text = "Select Role"
         self.permit_type.text = "Select Permit"
+        self.permit_type.values = []
         self.msg.text = ""
