@@ -48,9 +48,9 @@ def get_best_parking(user_id):
 
 def get_ranked_parking(user_id):
     lots = get_available_parking(user_id)
-    # Sort lots by spots left descending
     return sorted(lots, key=lambda x: x['spots_left'], reverse=True)
 
+#AUTOMATIC PERMIT ASSIGNMENT, DISREGARD 
 def add_user(user_id, permit_type):
     conn = get_connection()
     cursor = conn.cursor(dictionary=True)
