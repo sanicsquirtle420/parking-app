@@ -1,9 +1,9 @@
+from kivy.uix.screenmanager import ScreenManager, Screen, FadeTransition
 from utils.admin_lot_detail_screen import AdminLotDetailScreen
 from utils.admin_dashboard_screen import AdminDashboardScreen
 from utils.admin_analytics_screen import AdminAnalyticsScreen
 from utils.create_account_screen import CreateAccountScreen
 from utils.admin_permits_screen import AdminPermitsScreen
-from kivy.uix.screenmanager import ScreenManager, Screen
 from utils.tickets_screen import TicketsScreen
 from utils.login_screen import LoginScreen
 from utils.lot_outlines import LotOutline
@@ -83,7 +83,7 @@ class MainApp(App):
             "permit": "Visitor",
         }
 
-        sm = ScreenManager()
+        sm = ScreenManager(transition=FadeTransition(duration=0.15))
         sm.add_widget(LoginScreen(name="login"))
         sm.add_widget(CreateAccountScreen(name="create"))
         sm.add_widget(MainScreen(name="main"))
@@ -101,6 +101,12 @@ class MainApp(App):
         elif "visitor" in username.lower():
             return "Visitor"
         return "Student"
+    
+    def update_sidebar_profile(self):
+        self.profile_label.text = (
+            f"[b]{self.user_data.get('username')}[/b]\n"
+            f"{self.user_data.get('email')}\nAdmin Panel"
+        )
 
 
 if __name__ == "__main__":

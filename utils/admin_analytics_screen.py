@@ -26,10 +26,9 @@ class AdminAnalyticsScreen(AdminScreen):
 
         root = BoxLayout(orientation="horizontal")
 
-        sidebar = self.build_admin_sidebar(
-            active_screen="admin_analytics",
-            section_label="Analytics",
-        )
+        self.sidebar_container = BoxLayout(size_hint_x=0.25)
+        self.refresh_sidebar()
+        root.add_widget(self.sidebar_container)
 
         main = BoxLayout(
             orientation="vertical",
@@ -90,7 +89,7 @@ class AdminAnalyticsScreen(AdminScreen):
         scroll.add_widget(self.content)
         main.add_widget(scroll)
 
-        root.add_widget(sidebar)
+        # root.add_widget(sidebar)
         root.add_widget(main)
         self.add_widget(root)
 
@@ -124,14 +123,12 @@ class AdminAnalyticsScreen(AdminScreen):
         self.overloaded_box.clear_widgets()
         self.underutilized_box.clear_widgets()
 
-        # Helper to add widgets without freezing the UI
         def add_item(box, text, color):
             box.add_widget(Label(
                 text=text, color=color, halign="left", valign="middle",
                 size_hint_y=None, height=30
             ))
 
-        # Add data (If these lists are very long, this loop is the bottleneck)
         for p in data.get("peak", []):
             add_item(self.peak_box, f"Lot {p['lot_id']}: Peak {p['peak_occupancy']}", TEXT_DARK)
 
@@ -268,6 +265,8 @@ class AdminAnalyticsScreen(AdminScreen):
     def on_pre_enter(self):
         self._set_loading_state(True, False)
         threading.Thread(target=self._bg_load_data, daemon=True).start()
+        if hasattr(self, "refresh_sidebar"):
+            self.refresh_sidebar()
 
     def _bg_load_data(self):
         try:
@@ -278,3 +277,10 @@ class AdminAnalyticsScreen(AdminScreen):
         finally:
             Clock.schedule_once(lambda dt: self._set_loading_state(False, True))
 
+    def refresh_sidebar(self):
+        self.sidebar_container.clear_widgets()
+        new_sidebar = self.build_admin_sidebar(
+            active_screen="admin_analytics", 
+            section_label="Analytics"
+        )
+        self.sidebar_container.add_widget(new_sidebar)

@@ -104,6 +104,7 @@ class LoginScreen(Screen):
 
         if app.user_data["role"] == "admin":
             self.manager.current = "admin_dashboard"
+            self.manager.get_screen("admin_dashboard").refresh_sidebar()
         else:
             self.manager.current = "main"
             self.manager.get_screen("main").refresh_sidebar()

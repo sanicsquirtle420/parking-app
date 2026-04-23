@@ -5,13 +5,8 @@ from kivy.uix.button import Button
 from kivy.uix.label import Label
 from kivy.uix.scrollview import ScrollView
 from database.queries.admin_dashboard import get_all_lots
-from database.db import run_in_background
 from utils.admin_navigation import AdminScreen
 from kivy.clock import Clock
-from kivy.uix.recycleview import RecycleView
-from kivy.uix.recycleview.views import RecycleDataViewBehavior
-from kivy.uix.recycleboxlayout import RecycleBoxLayout
-from kivy.properties import StringProperty
 import math
 
 OM_RED = (0.816, 0.125, 0.176, 1)
@@ -22,15 +17,13 @@ TEXT_MUTED = (0.35, 0.35, 0.35, 1)
 class AdminDashboardScreen(AdminScreen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        # Token used to cancel stale page-change deferred calls
         self._page_token = 0
 
         root = BoxLayout(orientation="horizontal")
-
-        sidebar = self.build_admin_sidebar(
-            active_screen="admin_dashboard",
-            section_label="Dashboard",
-        )
+        
+        self.sidebar_container = BoxLayout(size_hint_x=0.25)
+        self.refresh_sidebar() 
+        root.add_widget(self.sidebar_container)
 
         main = BoxLayout(orientation="vertical", padding=20, spacing=12)
         with main.canvas.before:
@@ -45,6 +38,7 @@ class AdminDashboardScreen(AdminScreen):
             height=50,
             color=TEXT_DARK,
         ))
+
         main.add_widget(Label(
             text="Live lot occupancy and capacity overview",
             size_hint_y=None,
@@ -95,7 +89,6 @@ class AdminDashboardScreen(AdminScreen):
         self.pagination_bar = self._build_pagination_bar()
         main.add_widget(self.pagination_bar)
 
-        root.add_widget(sidebar)
         root.add_widget(main)
         self.add_widget(root)
 
@@ -211,7 +204,6 @@ class AdminDashboardScreen(AdminScreen):
 
     def _apply_lots(self, lots):
         import threading
-        # FIX: this is called on the main thread by _finish_refresh, so direct UI access is safe
         self._set_loading_state(False, False)
         print(f"DEBUG _apply_lots thread: {threading.current_thread().name}")
 
@@ -230,3 +222,12 @@ class AdminDashboardScreen(AdminScreen):
         if self.manager:
             self.manager.selected_admin_lot = lot
             self.manager.current = "admin_lot_detail"
+
+    def refresh_sidebar(self):
+        self.sidebar_container.clear_widgets()
+        new_sidebar = self.build_admin_sidebar(
+            active_screen="admin_dashboard",
+            section_label="Admin Dashboard",
+        )
+
+        self.sidebar_container.add_widget(new_sidebar)
