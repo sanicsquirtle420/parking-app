@@ -130,7 +130,7 @@ class AdminAnalyticsScreen(AdminScreen):
             ))
 
         for p in data.get("peak", []):
-            add_item(self.peak_box, f"Lot {p['lot_id']}: Peak {p['peak_occupancy']}", TEXT_DARK)
+            add_item(self.peak_box, f"{p['lot_name']}: Peak {p['peak_occupancy']}", TEXT_DARK)
 
         for e in data.get("ev", []):
             add_item(self.ev_box, f"{e['lot_name']} - Chargers: {e['ev_charger_count']}", TEXT_DARK)
