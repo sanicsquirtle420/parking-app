@@ -180,22 +180,17 @@ def get_permit_types():
     conn.close()
     return results
 
-def add_user(user_id, permit_name):
+def add_user(user_id):
     conn = get_connection()
     cursor = conn.cursor()
-
-    cursor.execute("SELECT permit_id FROM permits WHERE permit_name = %s", (permit_name,))
-    result = cursor.fetchone()
-    
-    if result:
-        permit_id = result[0]
-        query = """
+        
+    query = """
             INSERT INTO user_permits (user_id, permit_id, issued_date, expiration_date)
             VALUES (%s, %s, CURDATE(), DATE_ADD(CURDATE(), INTERVAL 1 YEAR))
         """
-        cursor.execute(query, (user_id, permit_id))
-        conn.commit()
-    
+    cursor.execute(query, (user_id, "VSD")) # Auto assigns Visitor Daily for new users
+    conn.commit()
+
     conn.close()
 
 def login_user(email, password):

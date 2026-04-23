@@ -33,10 +33,9 @@ class AdminLotDetailScreen(AdminScreen):
 
         root = BoxLayout(orientation="horizontal")
 
-        sidebar = self.build_admin_sidebar(
-            active_screen="admin_dashboard",
-            section_label="Manage Lot"
-        )
+        self.sidebar_container = BoxLayout(size_hint_x=0.25)
+        self.refresh_sidebar()
+        root.add_widget(self.sidebar_container)
 
         main = BoxLayout(orientation="vertical", padding=20, spacing=12)
 
@@ -134,13 +133,16 @@ class AdminLotDetailScreen(AdminScreen):
         scroll.add_widget(self.rules_box)
         main.add_widget(scroll)
 
-        root.add_widget(sidebar)
         root.add_widget(main)
         self.add_widget(root)
 
     def on_pre_enter(self):
+        self.refresh_sidebar()
         app = App.get_running_app()
-        lot = app.selected_admin_lot
+        lot = getattr(self.manager, "selected_admin_lot", None)
+        if not lot:
+            self.manager.current = "admin_dashboard"
+            return
         self.lot_id = lot["lot_id"]
 
         # Reset all rule-input fields immediately so stale state never shows
@@ -333,3 +335,11 @@ class AdminLotDetailScreen(AdminScreen):
             lambda: delete_rule(rule_id),
             lambda _: self.after_lot_mutation()
         )
+
+    def refresh_sidebar(self):
+        self.sidebar_container.clear_widgets()
+        new_sidebar = self.build_admin_sidebar(
+            active_screen="admin_dashboard",
+            section_label="Lot Details"
+        )
+        self.sidebar_container.add_widget(new_sidebar)
