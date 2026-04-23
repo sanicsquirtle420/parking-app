@@ -49,5 +49,3 @@ def get_best_parking(user_id):
 def get_ranked_parking(user_id):
     lots = get_available_parking(user_id)
     return sorted(lots, key=lambda x: x['spots_left'], reverse=True)
-    
-conn.close()

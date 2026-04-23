@@ -9,10 +9,20 @@ from utils.login_screen import LoginScreen
 from utils.lot_outlines import LotOutline
 from kivy.uix.boxlayout import BoxLayout
 from kivy_garden.mapview import MapView
+from kivy.core.window import Window
 from utils.buttons import Buttons
 from kivy.config import Config
 from kivy.app import App
+import signal 
 import json
+import os
+
+from database.db import warmup
+
+Window.size = (1200, 800)
+
+signal.signal(signal.SIGINT, signal.SIG_DFL)
+
 
 class MainScreen(Screen):
     def __init__(self, **kwargs):
@@ -56,6 +66,14 @@ class MainScreen(Screen):
 
 
 class MainApp(App):
+    def on_stop(self):
+        import database.db as _db
+        tunnel = _db._global_tunnel
+        if tunnel:
+            print("Closing SSH tunnel...")
+            tunnel.stop()
+        os.kill(os.getpid(), signal.SIGKILL)
+
     def build(self):
         self.title = "University of Mississippi Parking App"
 
@@ -86,4 +104,5 @@ class MainApp(App):
 
 
 if __name__ == "__main__":
+    warmup()
     MainApp().run()

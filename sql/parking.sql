@@ -53,15 +53,6 @@ CREATE TABLE parking_rules (
     FOREIGN KEY (permit_id) REFERENCES permits(permit_id)
 );
 
-CREATE TABLE parking_occupancy_log (
-    log_id INT AUTO_INCREMENT PRIMARY KEY,
-    lot_id INT NOT NULL,
-    recorded_at DATETIME NOT NULL,
-    occupancy INT NOT NULL,
-    ev_chargers_in_use INT NOT NULL DEFAULT 0,
-    FOREIGN KEY (lot_id) REFERENCES parking_lots(lot_id)
-);
-
 CREATE TABLE tickets (
     ticket_id INT AUTO_INCREMENT PRIMARY KEY,
     user_id VARCHAR(20) NOT NULL,
