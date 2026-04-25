@@ -3,7 +3,7 @@
     {
       "id": "fac_1",
       "name": "Meek West",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -100,7 +100,7 @@
     {
       "id": "fac_2",
       "name": "Tad Smith North",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -177,7 +177,7 @@
     {
       "id": "fac_3",
       "name": "Old Athletics",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -298,7 +298,7 @@
     {
       "id": "fac_4",
       "name": "Tad Smith",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -351,7 +351,7 @@
     {
       "id": "fac_5",
       "name": "Tad Smith",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -460,7 +460,7 @@
     {
       "id": "fac_6",
       "name": "Turner West",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -517,7 +517,7 @@
     {
       "id": "fac_7",
       "name": "Turner West",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -550,7 +550,7 @@
     {
       "id": "fac_8",
       "name": "Turner Rear",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -583,7 +583,7 @@
     {
       "id": "fac_9",
       "name": "Turner Rear",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -624,7 +624,7 @@
     {
       "id": "fac_10",
       "name": "Turner Rear",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -657,7 +657,7 @@
     {
       "id": "fac_11",
       "name": "Law School South",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -870,7 +870,7 @@
     {
       "id": "fac_12",
       "name": "Law School",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -907,7 +907,7 @@
     {
       "id": "fac_13",
       "name": "NCPA",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -1112,7 +1112,7 @@
     {
       "id": "fac_14",
       "name": "Faculty Row - RC West",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -1169,7 +1169,7 @@
     {
       "id": "fac_15",
       "name": "Faculty Row - RC West",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -1226,7 +1226,7 @@
     {
       "id": "fac_16",
       "name": "Faculty Row",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -1271,7 +1271,7 @@
     {
       "id": "fac_17",
       "name": "Sorority Circle",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -1348,7 +1348,7 @@
     {
       "id": "fac_18",
       "name": "Barnard Observatory Rear",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -1433,7 +1433,7 @@
     {
       "id": "fac_19",
       "name": "Yerby",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -1470,7 +1470,7 @@
     {
       "id": "fac_20",
       "name": "Yerby",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -1643,7 +1643,7 @@
     {
       "id": "fac_21",
       "name": "Yerby",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -1844,7 +1844,7 @@
     {
       "id": "fac_22",
       "name": "Yerby",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -1945,7 +1945,7 @@
     {
       "id": "fac_23",
       "name": "Music Bldg. East",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -2078,7 +2078,7 @@
     {
       "id": "fac_24",
       "name": "Music Bldg. East",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -2171,7 +2171,7 @@
     {
       "id": "fac_25",
       "name": "Memory House",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -2328,7 +2328,7 @@
     {
       "id": "fac_26",
       "name": "Mary Buie Museum",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -2457,7 +2457,7 @@
     {
       "id": "fac_27",
       "name": "Mary Buie Museum",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -2494,7 +2494,7 @@
     {
       "id": "fac_28",
       "name": "North Ln - On Street",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -2535,7 +2535,7 @@
     {
       "id": "fac_29",
       "name": "Lenoir Hall",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -2584,7 +2584,7 @@
     {
       "id": "fac_30",
       "name": "Lenoir Hall",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -2629,7 +2629,7 @@
     {
       "id": "fac_31",
       "name": "Meek East",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -2730,7 +2730,7 @@
     {
       "id": "fac_32",
       "name": "Magnolia Drive",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -2807,7 +2807,7 @@
     {
       "id": "fac_33",
       "name": "Guyton East",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -2876,7 +2876,7 @@
     {
       "id": "fac_34",
       "name": "Powers",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -2909,7 +2909,7 @@
     {
       "id": "fac_35",
       "name": "Guyton West",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -2946,7 +2946,7 @@
     {
       "id": "fac_36",
       "name": "Track",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -3007,7 +3007,7 @@
     {
       "id": "fac_37",
       "name": "Procurement",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -3228,7 +3228,7 @@
     {
       "id": "fac_38",
       "name": "Procurement",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -3261,7 +3261,7 @@
     {
       "id": "fac_39",
       "name": "SBA",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -3358,7 +3358,7 @@
     {
       "id": "fac_40",
       "name": "Food Srv. Mgmt.",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -3431,7 +3431,7 @@
     {
       "id": "fac_41",
       "name": "Food Srv. Mgmt.",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -3504,7 +3504,7 @@
     {
       "id": "fac_42",
       "name": "Insight Park",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -3737,7 +3737,7 @@
     {
       "id": "fac_43",
       "name": "Insight Park",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -3830,7 +3830,7 @@
     {
       "id": "fac_44",
       "name": "Insight Park",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -3911,7 +3911,7 @@
     {
       "id": "fac_45",
       "name": "Medicinal Plant Farm",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -3948,7 +3948,7 @@
     {
       "id": "fac_46",
       "name": "Medicinal Plant Farm",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -4033,7 +4033,7 @@
     {
       "id": "fac_47",
       "name": "Medicinal Plant Farm",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -4066,7 +4066,7 @@
     {
       "id": "fac_48",
       "name": "Waller Research Center",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -4099,7 +4099,7 @@
     {
       "id": "fac_49",
       "name": "Physical Plant",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -4140,7 +4140,7 @@
     {
       "id": "fac_50",
       "name": "Physical Plant",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -4193,7 +4193,7 @@
     {
       "id": "fac_51",
       "name": "Physical Plant",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -4242,7 +4242,7 @@
     {
       "id": "fac_52",
       "name": "Physical Plant",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -4275,7 +4275,7 @@
     {
       "id": "fac_53",
       "name": "Physical Plant",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -4364,7 +4364,7 @@
     {
       "id": "fac_54",
       "name": "Johnny Williams Generation Plant",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -4397,7 +4397,7 @@
     {
       "id": "fac_55",
       "name": "Johnny Williams Generation Plant",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -4430,7 +4430,7 @@
     {
       "id": "fac_56",
       "name": "Baseball",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -4611,7 +4611,7 @@
     {
       "id": "fac_57",
       "name": "Hill North - On Street",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -4688,7 +4688,7 @@
     {
       "id": "fac_58",
       "name": "Howry-Falkner",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -4757,7 +4757,7 @@
     {
       "id": "fac_59",
       "name": "Bishop",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -4878,7 +4878,7 @@
     {
       "id": "fac_60",
       "name": "Music Bldg. Rear",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -5011,7 +5011,7 @@
     {
       "id": "fac_61",
       "name": "Music Bldg. Rear",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -5048,7 +5048,7 @@
     {
       "id": "fac_62",
       "name": "Health Center",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -5133,7 +5133,7 @@
     {
       "id": "fac_63",
       "name": "Cross Street - On Street",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -5166,7 +5166,7 @@
     {
       "id": "fac_64",
       "name": "Cross Street - On Street",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -5203,7 +5203,7 @@
     {
       "id": "fac_65",
       "name": "Cross Street - On Street",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -5252,7 +5252,7 @@
     {
       "id": "fac_66",
       "name": "Cross Street - On Street",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -5285,7 +5285,7 @@
     {
       "id": "fac_67",
       "name": "Cross Street - On Street",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -5318,7 +5318,7 @@
     {
       "id": "fac_68",
       "name": "Dormitory Row West - West End",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -5359,7 +5359,7 @@
     {
       "id": "fac_69",
       "name": "Baxter Hall",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -5404,7 +5404,7 @@
     {
       "id": "fac_70",
       "name": "Bishop - On Street",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -5437,7 +5437,7 @@
     {
       "id": "fac_71",
       "name": "Bishop - On Street",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -5470,7 +5470,7 @@
     {
       "id": "fac_72",
       "name": "Honors College",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -5503,7 +5503,7 @@
     {
       "id": "fac_73",
       "name": "Farley/Lamar Hall",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -5556,7 +5556,7 @@
     {
       "id": "fac_74",
       "name": "Farley/Lamar Hall",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -5601,7 +5601,7 @@
     {
       "id": "fac_75",
       "name": "Farley/Lamar Hall",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -5634,7 +5634,7 @@
     {
       "id": "fac_76",
       "name": "Farley/Lamar Hall",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -5679,7 +5679,7 @@
     {
       "id": "fac_77",
       "name": "Coulter Rear",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -5712,7 +5712,7 @@
     {
       "id": "fac_78",
       "name": "Poole Dr. East - On Street",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -5753,7 +5753,7 @@
     {
       "id": "fac_79",
       "name": "Housing Service",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -5834,7 +5834,7 @@
     {
       "id": "fac_80",
       "name": "Housing Service",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -5927,7 +5927,7 @@
     {
       "id": "fac_81",
       "name": "Library Annex",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -5988,7 +5988,7 @@
     {
       "id": "fac_82",
       "name": "South Athletics Lot",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -6109,7 +6109,7 @@
     {
       "id": "fac_83",
       "name": "Athletics",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -6190,7 +6190,7 @@
     {
       "id": "fac_84",
       "name": "Athletics",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -6275,7 +6275,7 @@
     {
       "id": "fac_85",
       "name": "Athletics",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -6380,7 +6380,7 @@
     {
       "id": "fac_86",
       "name": "Athletics",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -6417,7 +6417,7 @@
     {
       "id": "fac_87",
       "name": "Jackson Avenue Center",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -6470,7 +6470,7 @@
     {
       "id": "fac_88",
       "name": "Ford Center/Depot",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -6503,7 +6503,7 @@
     {
       "id": "fac_89",
       "name": "Turner South/Tennis",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -6544,7 +6544,7 @@
     {
       "id": "fac_90",
       "name": "Manning West",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -6577,7 +6577,7 @@
     {
       "id": "fac_91",
       "name": "South Generation Plant",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -6678,7 +6678,7 @@
     {
       "id": "fac_92",
       "name": "JAC North",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -6711,7 +6711,7 @@
     {
       "id": "fac_93",
       "name": "Rebel Drive-Dorm Row North On Street",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -6744,7 +6744,7 @@
     {
       "id": "fac_94",
       "name": "North Lane",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -6777,7 +6777,7 @@
     {
       "id": "fac_95",
       "name": "Jackson Avenue Center",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -6826,7 +6826,7 @@
     {
       "id": "fac_96",
       "name": "RC West",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -6883,7 +6883,7 @@
     {
       "id": "fac_97",
       "name": "Jackson Avenue Center",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -6916,7 +6916,7 @@
     {
       "id": "fac_98",
       "name": "South Campus Rec. Facility",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -6957,7 +6957,7 @@
     {
       "id": "fac_99",
       "name": "SOC-Underbuilding",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -6990,7 +6990,7 @@
     {
       "id": "fac_100",
       "name": "Guyton West",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
@@ -7031,7 +7031,7 @@
     {
       "id": "fac_101",
       "name": "Ridge North",
-      "permit": "Faculty",
+      "permit": "Faculty/Staff",
       "color": [
         0.973,
         0.243,
