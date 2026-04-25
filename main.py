@@ -48,6 +48,7 @@ class MainScreen(Screen):
                     }
                 )
             except TypeError as e:
+                print(e)
                 print(f"Bad lot: {lot.get('id')} - {lot.get('name')}")
                 print(f"  coordinates type: {type(lot.get('coordinates'))}")
                 print(f"  first coord: {lot['coordinates'][0] if lot.get('coordinates') else 'N/A'}")

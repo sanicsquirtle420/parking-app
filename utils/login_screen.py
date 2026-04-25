@@ -54,14 +54,10 @@ class LoginScreen(Screen):
         login_btn = red_button("Login")
         login_btn.bind(on_release=self.login)
 
-        guest_btn = red_button("Continue as Visitor")
-        guest_btn.bind(on_release=self.guest)
-
         create_btn = red_button("Create Account")
         create_btn.bind(on_release=lambda x: setattr(self.manager, "current", "create"))
 
         root.add_widget(login_btn)
-        root.add_widget(guest_btn)
         root.add_widget(create_btn)
 
         self.error = Label(text="", color=(1, 0.3, 0.3, 1), size_hint_y=None, height=30)
@@ -74,8 +70,6 @@ class LoginScreen(Screen):
     def update_rect(self, *args):
         self.rect.size = self.size
         self.rect.pos = self.pos
-
-    #NEEDED TO CHANGE LOGIN INFORMATION TO GET USERID INFORMATION
 
     def login(self, instance):
         if not self.username.text or not self.password.text:
@@ -107,15 +101,6 @@ class LoginScreen(Screen):
         else:
             self.manager.current = "main"
             self.manager.get_screen("main").refresh_sidebar()
-
-    def guest(self, instance):
-        App.get_running_app().user_data = {
-            "username": "Guest",
-            "role": "Visitor",
-            "permit": "Visitor",
-        }
-        self.manager.current = "main"
-        self.manager.get_screen("main").refresh_sidebar()
 
     def reset_fields(self):
         self.username.text = ""

@@ -57,6 +57,7 @@ class LotOutline(MapLayer):
             self.hide_tooltip()
 
     def show_tooltip(self, pos):
+        visitor_passes = ["Visitor Daily", "Visitor Monthly", "Visitor Yearly"]
         if hasattr(self, '_tooltip') and self._tooltip:
             self.hide_tooltip()
 
@@ -67,7 +68,10 @@ class LotOutline(MapLayer):
         text = f"[b]{info.get('name', 'Parking Lot')}[/b]\n"
         text += f"Capacity: {info.get('capacity', 'N/A')}\n"
         text += f"Permit: {info.get('permit_required', 'N/A')}\n"
-        if user_permit == info.get("permit_required", "N/A"):
+
+        if info.get("permit_required", "N/A") == "Visitor" and user_permit in visitor_passes:
+            text += "[color=00ff00]You can park here.[/color]"
+        elif user_permit == info.get("permit_required", "N/A"):
             text += "[color=00ff00]You can park here.[/color]"
         else:
             text += "[color=ff0000]You can not park here.[/color]"
