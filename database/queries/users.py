@@ -184,3 +184,58 @@ def gen_userid(permit):
     finally:
         cursor.close()
         conn.close()
+
+def get_permit_types():
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT permit_name FROM permits")
+    results = [row[0] for row in cursor.fetchall()]
+    conn.close()
+    return results
+
+def add_user(user_id):
+    conn = get_connection()
+    cursor = conn.cursor()
+        
+    query = """
+            INSERT INTO user_permits (user_id, permit_id, issued_date, expiration_date)
+            VALUES (%s, %s, CURDATE(), DATE_ADD(CURDATE(), INTERVAL 1 YEAR))
+        """
+    cursor.execute(query, (user_id, "VSD")) # Auto assigns Visitor Daily for new users
+    conn.commit()
+
+    conn.close()
+
+def login_user(email, password):
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+    
+    query = """
+        SELECT u.*, p.permit_name 
+        FROM users u
+        LEFT JOIN user_permits up ON u.user_id = up.user_id
+        LEFT JOIN permits p ON up.permit_id = p.permit_id
+        WHERE u.email = %s AND u.password_hash = %s
+    """
+    
+    cursor.execute(query, (email, password))
+    user = cursor.fetchone()
+    conn.close()
+    return user
+
+def get_user(email):
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    cursor.execute("""
+        SELECT u.*, p.permit_name AS user_permit_name
+        FROM users u
+        LEFT JOIN user_permits up ON u.user_id = up.user_id
+        LEFT JOIN permits p on up.permit_id = p.permit_id
+        WHERE u.email = %s
+    """, (email,))
+
+    user = cursor.fetchone()
+    cursor.close()
+    conn.close()
+    return user

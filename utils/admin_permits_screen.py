@@ -45,10 +45,9 @@ class AdminPermitsScreen(AdminScreen):
 
         root = BoxLayout(orientation="horizontal")
 
-        sidebar = self.build_admin_sidebar(
-            active_screen="admin_permits",
-            section_label="Permits & Users"
-        )
+        self.sidebar_container = BoxLayout(size_hint_x=0.25)
+        self.refresh_sidebar()
+        root.add_widget(self.sidebar_container)
 
         main = BoxLayout(orientation="vertical", padding=20, spacing=12)
 
@@ -76,7 +75,6 @@ class AdminPermitsScreen(AdminScreen):
         self.status_label.bind(size=self.update_label_text_size)
         main.add_widget(self.status_label)
 
-        # ---- PERMIT ADD UI ----
         permits_row = BoxLayout(size_hint_y=None, height=45, spacing=10)
 
         self.permit_name_input = TextInput(
@@ -167,7 +165,6 @@ class AdminPermitsScreen(AdminScreen):
 
         main.add_widget(sort_row)
 
-        # ---- SEARCH ----
         search_row = BoxLayout(size_hint_y=None, height=45, spacing=10)
 
         self.search_input = TextInput(
@@ -214,12 +211,11 @@ class AdminPermitsScreen(AdminScreen):
         scroll = ScrollView()
         scroll.add_widget(self.user_box)
         main.add_widget(scroll)
-
-        root.add_widget(sidebar)
         root.add_widget(main)
         self.add_widget(root)
 
     def on_pre_enter(self):
+        self.refresh_sidebar()
         self.load_data()
 
     def _set_loading_state(self, is_loading, is_refresh):
@@ -643,3 +639,12 @@ class AdminPermitsScreen(AdminScreen):
             self.filter_spinner.text = "Filter by Permit"
 
         self.load_data("", force=True)
+
+    def refresh_sidebar(self):
+        self.sidebar_container.clear_widgets()
+        new_sidebar = self.build_admin_sidebar(
+            active_screen="admin_permits",
+            section_label="Permits and Users",
+        )
+
+        self.sidebar_container.add_widget(new_sidebar)

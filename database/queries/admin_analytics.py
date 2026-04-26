@@ -17,11 +17,10 @@ def get_analytics_data():
         overview = cursor.fetchone()
 
         cursor.execute("""
-            SELECT
-                lot_id,
-                MAX(occupancy) AS peak_occupancy
+            SELECT parking_lots.lot_name, MAX(occupancy) as peak_occupancy
             FROM parking_occupancy_log
-            GROUP BY lot_id
+            LEFT JOIN parking_lots ON parking_occupancy_log.lot_id = parking_lots.lot_id
+            GROUP BY parking_lots.lot_id
         """)
         peak = cursor.fetchall()
 

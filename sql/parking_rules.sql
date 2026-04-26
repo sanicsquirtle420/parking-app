@@ -4,6 +4,7 @@
 DROP TABLE IF EXISTS parking_rules;
 
 CREATE TABLE parking_rules (
+    rule_id INT AUTO_INCREMENT PRIMARY KEY,
     lot_id VARCHAR(50),
     permit_id VARCHAR(50),
     day_of_week VARCHAR(50),

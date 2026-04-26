@@ -10,7 +10,7 @@ from kivy.app import App
 
 ADMIN_NAV_ITEMS = [
     ("admin_dashboard", "Dashboard"),
-    ("admin_permits", "Permits & Users"),
+    ("admin_permits", "Permits and Users"),
     ("admin_analytics", "Analytics"),
 ]
 
@@ -41,7 +41,11 @@ class AdminScreen(Screen):
         self._bg_rect.size = self.size
 
     def on_enter(self, *args):
-        pass
+        if hasattr(self, "refresh_sidebar"):
+            self.refresh_sidebar()
+
+        if hasattr(self, "load_data"):
+            Clock.schedule_once(lambda dt: self.load_data(), 0.05)
 
     def on_leave(self, *args):
         if self._live_refresh_clock:
@@ -79,12 +83,20 @@ class AdminScreen(Screen):
 
         sidebar.bind(pos=self.update_rect, size=self.update_rect)
 
-        sidebar.add_widget(Label(
-            text="Admin Panel",
+        app = App.get_running_app()
+        user_info = getattr(app, "user_data", {})
+
+        user_label = Label(
+            text=f"[b]{user_info.get('username', 'Administrator')}[/b]\n{user_info.get('email', 'admin@olemiss.edu')}",
+            markup=True,
             size_hint_y=None,
-            height=40,
+            height=100,
             color=(1, 1, 1, 1),
-        ))
+            halign="center",
+            valign="middle",
+        )
+        user_label.bind(size=lambda s, v: setattr(s, 'text_size', v))
+        sidebar.add_widget(user_label)
 
         if section_label:
             sidebar.add_widget(Label(
@@ -94,12 +106,13 @@ class AdminScreen(Screen):
                 color=(0.7, 0.8, 1, 1),
             ))
 
-        for screen_name, label in ADMIN_NAV_ITEMS:
-            sidebar.add_widget(self.build_admin_nav_button(
-                text=label,
+        for screen_name, label_text in ADMIN_NAV_ITEMS:
+            btn = self.build_admin_nav_button(
+                text=label_text,
                 target=screen_name,
                 active=(screen_name == active_screen),
-            ))
+            )
+            sidebar.add_widget(btn)
 
         sidebar.add_widget(self.build_admin_nav_button(
             text=back_label,
@@ -107,6 +120,9 @@ class AdminScreen(Screen):
             active=False,
             height=50,
         ))
+
+        sidebar.add_widget(BoxLayout())
+
         return sidebar
 
     def build_admin_nav_button(self, text, target, active=False, height=46):
@@ -125,11 +141,6 @@ class AdminScreen(Screen):
             return
         app = App.get_running_app()
         if target == "main" and app.user_data.get("role") == "admin":
-            app.user_data = {
-                "username": "Guest",
-                "role": "Visitor",
-                "permit": "Visitor",
-            }
             self.manager.current = target
             self.manager.get_screen("main").refresh_sidebar()
             return
