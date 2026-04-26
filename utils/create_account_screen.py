@@ -8,8 +8,7 @@ from kivy.uix.spinner import Spinner, SpinnerOption
 from kivy.uix.button import Button
 from kivy.graphics import Color, Rectangle
 from kivy.lang import Builder
-from database.queries.users import create_user, gen_userid
-from database.queries.parking import add_user
+from database.queries.users import create_user, gen_userid, add_user
 
 Builder.load_string('''
 <BorderedSpinnerOption@SpinnerOption>:
@@ -160,7 +159,7 @@ class CreateAccountScreen(Screen):
             self.msg.text = "A user is already using that email."
             return
 
-        # add_user(user_id, self.permit_type.text)
+        add_user(user_id)
 
         App.get_running_app().user_data = {
             "user_id": user_id,

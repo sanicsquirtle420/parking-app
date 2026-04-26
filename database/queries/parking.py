@@ -49,37 +49,3 @@ def get_best_parking(user_id):
 def get_ranked_parking(user_id):
     lots = get_available_parking(user_id)
     return sorted(lots, key=lambda x: x['spots_left'], reverse=True)
-
-#AUTOMATIC PERMIT ASSIGNMENT, DISREGARD 
-def add_user(user_id, permit_type):
-    conn = get_connection()
-    cursor = conn.cursor(dictionary=True)
-    now = datetime.now()
-    current_day = now.strftime('%Y-%m-%d')
-    if permit_type == "Student":
-        permit = "RC"
-    elif permit_type == "Faculty/Staff":
-        permit = "FS"
-    elif permit_type == "Visitor":
-        permit = "VSD"
-    else:
-        print("Unknown permit type: ", permit_type)
-        return
-
-    try:
-        
-        cursor.execute("""
-            INSERT INTO user_permits (user_id, permit_id, issued_date, expiration_date) 
-            VALUES(%s, %s, %s, %s)
-        """, (user_id, permit, current_day, "2026-07-31"))
-        conn.commit()
-        return 
-
-    except Exception as e:
-        conn.rollback()
-        print("Error adding user to permit_users:", e)
-        raise
-
-    finally:
-        cursor.close()
-        conn.close()
