@@ -204,9 +204,7 @@ class AdminDashboardScreen(AdminScreen):
         )
 
     def _apply_lots(self, lots):
-        import threading
         self._set_loading_state(False, False)
-        print(f"DEBUG _apply_lots thread: {threading.current_thread().name}")
 
         if lots is None:
             self.rv.data = []

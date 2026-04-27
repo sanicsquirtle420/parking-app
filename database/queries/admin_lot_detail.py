@@ -106,7 +106,6 @@ def update_lot_capacity(lot_id, capacity):
         cursor.close()
         conn.close()
 
-
 def update_lot_occupancy(lot_id, occupancy):
     if occupancy < 0:
         return _result(False, "Occupancy must be zero or greater.")
