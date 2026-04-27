@@ -16,3 +16,11 @@ def get_user_tickets(user_id):
     finally:
         cursor.close()
         conn.close()
+
+def pay_all_user_tickets(user_id):
+    conn = get_connection()
+    cursor = conn.cursor()
+    query = "UPDATE tickets SET status = 'Paid' WHERE user_id = %s AND status = 'Unpaid'"
+    cursor.execute(query, (user_id,))
+    conn.commit()
+    conn.close()
