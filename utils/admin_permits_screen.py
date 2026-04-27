@@ -11,6 +11,7 @@ from kivy.uix.popup import Popup
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.spinner import Spinner
 from kivy.uix.textinput import TextInput
+from kivy.uix.widget import Widget
 
 from utils.admin_navigation import AdminScreen
 from database.db import run_in_background
@@ -23,6 +24,7 @@ from database.queries.admin_permits import (
     revoke_user_permit,
     renew_user_permit,
 )
+from database.queries.tickets import create_ticket, get_user_tickets
 
 NAVY = (0.07, 0.12, 0.26, 1)
 LIGHT_BG = (0.96, 0.97, 0.98, 1)
@@ -547,14 +549,17 @@ class AdminPermitsScreen(AdminScreen):
         )
         info.bind(size=self.update_label_text_size)
 
-        row = BoxLayout(size_hint_y=None, height=45, spacing=10)
+        row = BoxLayout(size_hint_y=None, height=50, spacing=10, padding=[5, 5])
 
         spinner = Spinner(
-            text="Select Permit",
+            text="Select Permit Type",
             values=list(self.permit_map.keys()),
-            size_hint_x=0.4,
+            size_hint_x=None,
+            width=190,
             size_hint_y=None,
             height=40,
+            font_size=14,
+            text_size=(180, None),
             background_normal="",
             background_color=(0.9, 0.9, 0.9, 1),
             color=(0, 0, 0, 1)
@@ -562,42 +567,311 @@ class AdminPermitsScreen(AdminScreen):
 
         assign = Button(
             text="Assign",
-            size_hint_x=0.2,
+            size_hint_x=None,
+            width=90,
             size_hint_y=None,
             height=40,
+            font_size=14,
             background_normal="",
             background_color=NAVY
         )
         revoke = Button(
             text="Revoke",
-            size_hint_x=0.2,
+            size_hint_x=None,
+            width=90,
             size_hint_y=None,
             height=40,
+            font_size=14,
             background_normal="",
             background_color=RED
         )
         renew = Button(
             text="Renew",
-            size_hint_x=0.2,
+            size_hint_x=None,
+            width=90,
             size_hint_y=None,
             height=40,
+            font_size=14,
             background_normal="",
             background_color=GREEN
+        )
+        ticket_btn = Button(
+            text="Ticket",
+            size_hint_x=None,
+            width=90,
+            size_hint_y=None,
+            height=40,
+            font_size=14,
+            background_normal="",
+            background_color=NAVY
         )
 
         assign.bind(on_release=lambda x: self.assign(user, spinner))
         revoke.bind(on_release=lambda x: self.revoke(user))
         renew.bind(on_release=lambda x: self.renew(user))
+        ticket_btn.bind(on_release=lambda x: self.open_ticket_popup(user))
 
         row.add_widget(spinner)
+        row.add_widget(Widget(size_hint_x=1))
         row.add_widget(assign)
         row.add_widget(revoke)
         row.add_widget(renew)
+        row.add_widget(ticket_btn)
 
         card.add_widget(info)
         card.add_widget(row)
 
         return card
+
+    def open_ticket_popup(self, user):
+        content = BoxLayout(orientation="vertical", spacing=12, padding=18)
+
+        status_label = Label(
+            text="",
+            size_hint_y=None,
+            height=24,
+            color=(0.4, 0.4, 0.4, 1),
+            halign="left",
+            valign="middle",
+        )
+        status_label.bind(size=self.update_label_text_size)
+        content.add_widget(status_label)
+
+        ticket_title = Label(
+            text="Existing Tickets",
+            size_hint_y=None,
+            height=28,
+            color=TEXT_DARK,
+            bold=True,
+            font_size=17,
+            halign="left",
+            valign="middle",
+        )
+        ticket_title.bind(size=self.update_label_text_size)
+        content.add_widget(ticket_title)
+
+        ticket_list = BoxLayout(orientation="vertical", spacing=9, size_hint_y=None, padding=[0, 0, 0, 4])
+        ticket_list.bind(minimum_height=ticket_list.setter("height"))
+
+        ticket_scroll = ScrollView(size_hint=(1, 0.42))
+        ticket_scroll.add_widget(ticket_list)
+        content.add_widget(ticket_scroll)
+
+        separator = BoxLayout(size_hint_y=None, height=1)
+        with separator.canvas.before:
+            Color(0.78, 0.78, 0.78, 1)
+            separator.rect = Rectangle(pos=separator.pos, size=separator.size)
+        separator.bind(pos=self.update_rect, size=self.update_rect)
+        content.add_widget(separator)
+
+        form_title = Label(
+            text="Add Ticket",
+            size_hint_y=None,
+            height=28,
+            color=TEXT_DARK,
+            bold=True,
+            font_size=17,
+            halign="left",
+            valign="middle",
+        )
+        form_title.bind(size=self.update_label_text_size)
+        content.add_widget(form_title)
+
+        form = BoxLayout(orientation="vertical", size_hint_y=None, height=184, spacing=10)
+
+        amount_input = TextInput(
+            hint_text="Amount",
+            multiline=False,
+            size_hint_y=None,
+            height=40,
+            padding=[10, 10],
+            background_color=(1, 1, 1, 1),
+            foreground_color=(0, 0, 0, 1),
+        )
+        description_input = TextInput(
+            hint_text="Description",
+            multiline=True,
+            size_hint_y=None,
+            height=84,
+            padding=[10, 10],
+            background_color=(1, 1, 1, 1),
+            foreground_color=(0, 0, 0, 1),
+        )
+        status_spinner = Spinner(
+            text="Unpaid",
+            values=["Unpaid", "Paid", "Pending"],
+            size_hint_y=None,
+            height=40,
+            background_normal="",
+            background_color=(0.9, 0.9, 0.9, 1),
+            color=(0, 0, 0, 1),
+        )
+
+        form.add_widget(amount_input)
+        form.add_widget(description_input)
+        form.add_widget(status_spinner)
+        content.add_widget(form)
+
+        button_row = BoxLayout(size_hint_y=None, height=40, spacing=10)
+        button_row.add_widget(Widget(size_hint_x=1))
+        add_btn = Button(
+            text="Add Ticket",
+            size_hint_x=None,
+            width=120,
+            size_hint_y=None,
+            height=40,
+            background_normal="",
+            background_color=NAVY,
+        )
+        close_btn = Button(
+            text="Close",
+            size_hint_x=None,
+            width=110,
+            size_hint_y=None,
+            height=40,
+            background_normal="",
+            background_color=GRAY,
+        )
+        button_row.add_widget(add_btn)
+        button_row.add_widget(close_btn)
+        content.add_widget(button_row)
+
+        popup = Popup(
+            title="User Tickets",
+            content=content,
+            size_hint=(0.6, 0.65),
+        )
+
+        popup_state = {
+            "user": user,
+            "ticket_list": ticket_list,
+            "status_label": status_label,
+            "amount_input": amount_input,
+            "description_input": description_input,
+            "status_spinner": status_spinner,
+        }
+
+        add_btn.bind(on_release=lambda *_: self.add_ticket_from_popup(popup_state))
+        close_btn.bind(on_release=popup.dismiss)
+        popup.bind(on_open=lambda *_: self.load_ticket_popup_list(popup_state))
+        popup.open()
+
+    def load_ticket_popup_list(self, popup_state, clear_status=True):
+        ticket_list = popup_state["ticket_list"]
+        status_label = popup_state["status_label"]
+        ticket_list.clear_widgets()
+        ticket_list.add_widget(Label(
+            text="Loading tickets...",
+            size_hint_y=None,
+            height=40,
+            color=(0.4, 0.4, 0.4, 1),
+        ))
+        if clear_status:
+            status_label.text = ""
+        user_id = popup_state["user"]["user_id"]
+
+        run_in_background(
+            lambda: get_user_tickets(user_id),
+            lambda tickets: self.apply_ticket_popup_list(popup_state, tickets),
+        )
+
+    def apply_ticket_popup_list(self, popup_state, tickets):
+        ticket_list = popup_state["ticket_list"]
+        status_label = popup_state["status_label"]
+        ticket_list.clear_widgets()
+
+        if tickets is None:
+            status_label.text = "Unable to load tickets."
+            return
+
+        if not tickets:
+            ticket_list.add_widget(Label(
+                text="No tickets found",
+                size_hint_y=None,
+                height=40,
+                color=(0.4, 0.4, 0.4, 1),
+            ))
+            return
+
+        for ticket in tickets:
+            ticket_list.add_widget(self.build_admin_ticket_card(ticket))
+
+    def build_admin_ticket_card(self, ticket):
+        card = BoxLayout(
+            orientation="vertical",
+            size_hint_y=None,
+            height=70,
+            padding=[12, 8],
+            spacing=4,
+        )
+        with card.canvas.before:
+            Color(*CARD_BG)
+            card.rect = Rectangle(pos=card.pos, size=card.size)
+        card.bind(pos=self.update_rect, size=self.update_rect)
+
+        description = ticket.get("description") or "No description provided"
+        label = Label(
+            text=(
+                f"Date: {ticket.get('issue_date')} | "
+                f"${ticket.get('amount')} | "
+                f"Status: {ticket.get('status')}\n"
+                f"{description}"
+            ),
+            color=TEXT_DARK,
+            halign="left",
+            valign="middle",
+        )
+        label.bind(size=self.update_label_text_size)
+        card.add_widget(label)
+        return card
+
+    def add_ticket_from_popup(self, popup_state):
+        user_id = popup_state["user"]["user_id"]
+        amount_input = popup_state["amount_input"]
+        description_input = popup_state["description_input"]
+        status_spinner = popup_state["status_spinner"]
+        status_label = popup_state["status_label"]
+
+        amount_text = amount_input.text.strip()
+        description = description_input.text.strip()
+        status = status_spinner.text
+
+        if not amount_text:
+            status_label.text = "Amount is required."
+            return
+
+        try:
+            amount = float(amount_text)
+        except ValueError:
+            status_label.text = "Amount must be numeric."
+            return
+
+        if amount <= 0:
+            status_label.text = "Amount must be greater than zero."
+            return
+
+        if not description:
+            status_label.text = "Description is required."
+            return
+
+        status_label.text = "Adding ticket..."
+        run_in_background(
+            lambda: create_ticket(user_id, amount, description, status),
+            lambda result: self.after_ticket_created(popup_state, result),
+        )
+
+    def after_ticket_created(self, popup_state, result):
+        status_label = popup_state["status_label"]
+
+        if not result or not result.get("ok"):
+            status_label.text = result.get("message") if result else "Unable to create ticket."
+            return
+
+        popup_state["amount_input"].text = ""
+        popup_state["description_input"].text = ""
+        popup_state["status_spinner"].text = "Unpaid"
+        status_label.text = result.get("message", "Ticket created.")
+        self.load_ticket_popup_list(popup_state, clear_status=False)
 
     def assign(self, user, spinner):
         if spinner.text not in self.permit_map:

@@ -17,6 +17,30 @@ def get_user_tickets(user_id):
         cursor.close()
         conn.close()
 
+def create_ticket(user_id, amount, description, status):
+    conn = None
+    cursor = None
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+        query = """
+            INSERT INTO tickets (user_id, amount, description, status)
+            VALUES (%s, %s, %s, %s)
+        """
+        cursor.execute(query, (user_id, amount, description, status))
+        conn.commit()
+        return {"ok": True, "message": "Ticket created."}
+    except Exception as e:
+        if conn:
+            conn.rollback()
+        print("Error creating ticket:", e)
+        return {"ok": False, "message": "Unable to create ticket."}
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
 def pay_all_user_tickets(user_id):
     conn = get_connection()
     cursor = conn.cursor()
