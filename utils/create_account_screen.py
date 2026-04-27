@@ -166,7 +166,7 @@ class CreateAccountScreen(Screen):
             "username": f"{self.first.text.strip()} {self.last.text.strip()}",
             "email": self.email.text.strip(),
             "role": self.role.text,        
-            "permit": "Visitor Daily"
+            "permit": "No permit assigned"
         }
 
         self.manager.current = "main"
