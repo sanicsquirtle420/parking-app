@@ -4,6 +4,7 @@ from utils.admin_dashboard_screen import AdminDashboardScreen
 from utils.admin_analytics_screen import AdminAnalyticsScreen
 from utils.create_account_screen import CreateAccountScreen
 from utils.admin_permits_screen import AdminPermitsScreen
+from utils.pay_tickets_screen import PayTicketsScreen
 from utils.tickets_screen import TicketsScreen
 from utils.login_screen import LoginScreen
 from utils.lot_outlines import LotOutline
@@ -88,6 +89,7 @@ class MainApp(App):
         sm.add_widget(CreateAccountScreen(name="create"))
         sm.add_widget(MainScreen(name="main"))
         sm.add_widget(TicketsScreen(name="tickets"))
+        sm.add_widget(PayTicketsScreen(name='pay_tickets'))
         sm.add_widget(AdminDashboardScreen(name="admin_dashboard"))
         sm.add_widget(AdminLotDetailScreen(name="admin_lot_detail"))
         sm.add_widget(AdminPermitsScreen(name="admin_permits"))
