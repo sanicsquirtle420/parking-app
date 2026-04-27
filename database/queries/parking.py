@@ -24,6 +24,8 @@ def get_available_parking(user_id):
             JOIN parking_rules pr ON up.permit_id = pr.permit_id
             JOIN parking_lots pl ON pr.lot_id = pl.lot_id
             WHERE u.user_id = %s
+              AND up.expiration_date >= NOW()
+              AND pr.is_allowed = TRUE
               AND FIND_IN_SET(%s, pr.day_of_week)
               AND %s BETWEEN pr.start_time AND pr.end_time
               AND pl.current_occupancy < pl.capacity

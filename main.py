@@ -4,6 +4,7 @@ from utils.admin_dashboard_screen import AdminDashboardScreen
 from utils.admin_analytics_screen import AdminAnalyticsScreen
 from utils.create_account_screen import CreateAccountScreen
 from utils.admin_permits_screen import AdminPermitsScreen
+from database.queries.map_data import get_map_lot_lookup
 from utils.tickets_screen import TicketsScreen
 from utils.login_screen import LoginScreen
 from utils.lot_outlines import LotOutline
@@ -12,17 +13,15 @@ from kivy_garden.mapview import MapView
 from kivy.core.window import Window
 from utils.buttons import Buttons
 from kivy.config import Config
+from database.db import warmup
 from kivy.app import App
 import signal 
 import json
 import os
 
-from database.db import warmup
-
 Window.size = (1200, 800)
 
 signal.signal(signal.SIGINT, signal.SIG_DFL)
-
 
 class MainScreen(Screen):
     def __init__(self, **kwargs):
@@ -35,15 +34,19 @@ class MainScreen(Screen):
         with open("utils/lot_cords.json") as f:
             data = json.load(f)
         lots = data["parking_lots"]
+        lot_lookup = get_map_lot_lookup()
 
         for lot in lots:
             try:
+                db_lot = lot_lookup.get(lot["id"], {})
                 outline = LotOutline(
                     lot["coordinates"],
                     tuple(lot["color"]),
                     info = {
                         "name": lot["name"],
-                        "capacity": 250,
+                        "lot_id": lot["id"],
+                        "capacity": db_lot.get("capacity", 999),
+                        "current_occupancy": db_lot.get("current_occupancy", 999),
                         "permit_required": lot["permit"]
                     }
                 )
@@ -108,7 +111,6 @@ class MainApp(App):
             f"[b]{self.user_data.get('username')}[/b]\n"
             f"{self.user_data.get('email')}\nAdmin Panel"
         )
-
 
 if __name__ == "__main__":
     warmup()
