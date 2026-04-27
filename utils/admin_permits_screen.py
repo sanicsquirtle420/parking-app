@@ -560,10 +560,10 @@ class AdminPermitsScreen(AdminScreen):
         spinner = Spinner(
             text="Select Permit Type",
             values=list(self.permit_map.keys()),
-            size_hint_x=1,
+            size_hint_x=0.35,
             size_hint_y=None,
             height=40,
-            font_size=14,
+            font_size=13,
             background_normal="",
             background_color=(0.9, 0.9, 0.9, 1),
             color=(0, 0, 0, 1)
@@ -571,41 +571,37 @@ class AdminPermitsScreen(AdminScreen):
 
         assign = Button(
             text="Assign",
-            size_hint_x=None,
-            width=80,
+            size_hint_x=0.13,
             size_hint_y=None,
             height=40,
-            font_size=14,
+            font_size=13,
             background_normal="",
             background_color=NAVY
         )
         revoke = Button(
             text="Revoke",
-            size_hint_x=None,
-            width=80,
+            size_hint_x=0.13,
             size_hint_y=None,
             height=40,
-            font_size=14,
+            font_size=13,
             background_normal="",
             background_color=RED
         )
         renew = Button(
             text="Renew",
-            size_hint_x=None,
-            width=80,
+            size_hint_x=0.13,
             size_hint_y=None,
             height=40,
-            font_size=14,
+            font_size=13,
             background_normal="",
             background_color=GREEN
         )
         ticket_btn = Button(
             text="Ticket",
-            size_hint_x=None,
-            width=80,
+            size_hint_x=0.13,
             size_hint_y=None,
             height=40,
-            font_size=14,
+            font_size=13,
             background_normal="",
             background_color=NAVY
         )
@@ -635,7 +631,7 @@ class AdminPermitsScreen(AdminScreen):
         outer = BoxLayout(orientation="vertical")
 
         # Header bar
-        header = BoxLayout(orientation="horizontal", size_hint_y=None, height=48)
+        header = BoxLayout(orientation="horizontal", size_hint_y=None, height=56)
         with header.canvas.before:
             Color(*POPUP_NAVY)
             header.rect = Rectangle(pos=header.pos, size=header.size)
@@ -643,7 +639,7 @@ class AdminPermitsScreen(AdminScreen):
         header_label = Label(
             text="User Tickets",
             color=POPUP_WHITE,
-            font_size=16,
+            font_size=20,
             bold=True,
             halign="left",
             padding=[16, 0],
@@ -653,7 +649,7 @@ class AdminPermitsScreen(AdminScreen):
         outer.add_widget(header)
 
         # Red accent bar
-        accent = BoxLayout(size_hint_y=None, height=3)
+        accent = BoxLayout(size_hint_y=None, height=4)
         with accent.canvas.before:
             Color(*POPUP_RED)
             accent.rect = Rectangle(pos=accent.pos, size=accent.size)
@@ -661,7 +657,7 @@ class AdminPermitsScreen(AdminScreen):
         outer.add_widget(accent)
 
         # White content area
-        content = BoxLayout(orientation="vertical", spacing=10, padding=[16, 12, 16, 12])
+        content = BoxLayout(orientation="vertical", spacing=12, padding=[16, 12, 16, 12])
         with content.canvas.before:
             Color(*POPUP_WHITE)
             content.rect = Rectangle(pos=content.pos, size=content.size)
@@ -717,8 +713,10 @@ class AdminPermitsScreen(AdminScreen):
             hint_text="Amount",
             multiline=False,
             size_hint_y=None,
-            height=40,
-            padding=[10, 10],
+            height=44,
+            padding=[12, 10],
+            font_size=15,
+            hint_text_color=(0.6, 0.6, 0.6, 1),
             background_color=POPUP_FIELD_BG,
             foreground_color=(0.1, 0.1, 0.1, 1),
         )
@@ -726,15 +724,19 @@ class AdminPermitsScreen(AdminScreen):
             hint_text="Description",
             multiline=True,
             size_hint_y=None,
-            height=72,
-            padding=[10, 10],
+            height=90,
+            padding=[12, 10],
+            font_size=15,
+            hint_text_color=(0.6, 0.6, 0.6, 1),
             background_color=POPUP_FIELD_BG,
             foreground_color=(0.1, 0.1, 0.1, 1),
         )
         status_spinner = Button(
             text="Unpaid",
             size_hint_y=None,
-            height=40,
+            height=44,
+            font_size=15,
+            bold=True,
             background_normal="",
             background_color=POPUP_RED,
             color=POPUP_WHITE,
@@ -757,17 +759,19 @@ class AdminPermitsScreen(AdminScreen):
         button_row = BoxLayout(
             orientation="horizontal",
             size_hint_y=None,
-            height=40,
-            spacing=8,
+            height=44,
+            spacing=10,
         )
         button_row.add_widget(Widget(size_hint_x=1))
 
         add_btn = Button(
             text="Add Ticket",
             size_hint_x=None,
-            width=120,
+            width=130,
             size_hint_y=None,
-            height=40,
+            height=44,
+            font_size=14,
+            bold=True,
             background_normal="",
             background_color=POPUP_NAVY,
             color=POPUP_WHITE,
@@ -776,9 +780,10 @@ class AdminPermitsScreen(AdminScreen):
         close_btn = Button(
             text="Close",
             size_hint_x=None,
-            width=100,
+            width=130,
             size_hint_y=None,
-            height=40,
+            height=44,
+            font_size=14,
             background_normal="",
             background_color=POPUP_WHITE,
             color=POPUP_NAVY,
@@ -803,7 +808,8 @@ class AdminPermitsScreen(AdminScreen):
             separator_height=0,
             content=outer,
             size_hint=(None, None),
-            size=(520, 540),
+            size=(620, 580),
+            pos_hint={"center_x": 0.5, "center_y": 0.5},
             background="atlas://data/images/defaulttheme/modalview-background",
             background_color=(1, 1, 1, 1),
         )
@@ -871,8 +877,8 @@ class AdminPermitsScreen(AdminScreen):
         card = BoxLayout(
             orientation="horizontal",
             size_hint_y=None,
-            height=64,
-            padding=[12, 8],
+            height=72,
+            padding=[12, 10],
             spacing=8,
         )
         with card.canvas.before:
@@ -887,35 +893,37 @@ class AdminPermitsScreen(AdminScreen):
         date_label = Label(
             text=issue_date,
             color=(0.35, 0.35, 0.35, 1),
-            font_size=12,
+            font_size=13,
             halign="left",
             valign="middle",
             size_hint_y=None,
-            height=22,
+            height=24,
         )
         date_label.bind(size=self.update_label_text_size)
         desc_label = Label(
             text=description,
             color=TEXT_DARK,
-            font_size=13,
+            font_size=14,
+            bold=True,
             halign="left",
             valign="middle",
             size_hint_y=None,
-            height=26,
+            height=28,
         )
         desc_label.bind(size=self.update_label_text_size)
         text_col.add_widget(date_label)
         text_col.add_widget(desc_label)
 
-        badges = BoxLayout(orientation="vertical", size_hint_x=None, width=90, spacing=4)
+        badges = BoxLayout(orientation="vertical", size_hint_x=None, width=100, spacing=4)
 
         amount_badge = Label(
             text=f"${ticket.get('amount')}",
             size_hint_y=None,
-            height=24,
-            font_size=12,
+            height=28,
+            font_size=13,
             bold=True,
             color=(1, 1, 1, 1),
+            padding=(10, 4),
         )
         with amount_badge.canvas.before:
             Color(*POPUP_NAVY)
@@ -927,8 +935,8 @@ class AdminPermitsScreen(AdminScreen):
         status_badge = Label(
             text=status_val,
             size_hint_y=None,
-            height=20,
-            font_size=11,
+            height=22,
+            font_size=12,
             color=GREEN_TEXT if is_paid else (0.7, 0.4, 0.0, 1),
         )
         with status_badge.canvas.before:
