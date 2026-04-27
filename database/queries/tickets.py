@@ -41,6 +41,36 @@ def create_ticket(user_id, amount, description, status):
         if conn:
             conn.close()
 
+def delete_ticket(ticket_id):
+    conn = get_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute("DELETE FROM tickets WHERE ticket_id = %s", (ticket_id,))
+        conn.commit()
+        return {"ok": True}
+    except Exception as e:
+        conn.rollback()
+        print("Error deleting ticket:", e)
+        return {"ok": False}
+    finally:
+        cursor.close()
+        conn.close()
+
+def toggle_ticket_status(ticket_id, new_status):
+    conn = get_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute("UPDATE tickets SET status = %s WHERE ticket_id = %s", (new_status, ticket_id))
+        conn.commit()
+        return {"ok": True}
+    except Exception as e:
+        conn.rollback()
+        print("Error toggling ticket status:", e)
+        return {"ok": False}
+    finally:
+        cursor.close()
+        conn.close()
+
 def pay_all_user_tickets(user_id):
     conn = get_connection()
     cursor = conn.cursor()
