@@ -38,6 +38,19 @@ def create_user(user_id, first_name, last_name, email, password, role):
         cursor.close()
         conn.close()
 
+def add_user(user_id):
+    conn = get_connection()
+    cursor = conn.cursor()
+        
+    query = """
+            INSERT INTO user_permits (user_id, permit_id, issued_date, expiration_date)
+            VALUES (%s, %s, CURDATE(), DATE_ADD(CURDATE(), INTERVAL 1 YEAR))
+        """
+    cursor.execute(query, (user_id, "VSD")) # Auto assigns Visitor Daily for new users
+    conn.commit()
+
+    conn.close()
+
 def get_user(email):
     conn = get_connection()
     cursor = conn.cursor(dictionary=True)
