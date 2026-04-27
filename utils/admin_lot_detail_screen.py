@@ -273,7 +273,7 @@ class AdminLotDetailScreen(AdminScreen):
             row = BoxLayout(size_hint_y=None, height=45, spacing=10)
 
             txt = Label(
-                text=f"{r['day_of_week']} {r['start_time']}–{r['end_time']}",
+                text=f"{r['permit_name']}: {r['day_of_week']} {r['start_time']}–{r['end_time']}",
                 color=(0,0,0,1),
                 size_hint_x=0.5,
                 halign="left"

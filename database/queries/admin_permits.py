@@ -1,14 +1,10 @@
 from datetime import datetime, timedelta
-
 from database.db import get_connection
-
 
 DEFAULT_USER_LIMIT = 100
 
-
 def _result(ok, message):
     return {"ok": ok, "message": message}
-
 
 def get_admin_permits_snapshot(search_text=None, limit=DEFAULT_USER_LIMIT):
     conn = get_connection()

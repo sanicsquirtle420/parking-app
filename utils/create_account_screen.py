@@ -89,7 +89,7 @@ class CreateAccountScreen(Screen):
 
         self.role = Spinner(
             text="Select Role",
-            values=("Student", "Faculty/Staff", "Admin"),
+            values=("Student", "Faculty/Staff", "Visitor", "Admin"),
             size_hint_y=None,
             height=48,
             background_normal="",
