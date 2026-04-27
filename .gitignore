@@ -1,0 +1,17 @@
+# Default ignored files
+/shelf/
+/workspace.xml
+__pycache__/
+.vscode/
+.DS_Store/
+.DS_Store
+**/.env
+.lnk
+.idea/
+*.cfg
+bin/
+cache/
+icons/
+include/
+venv311/
+.kivy/
