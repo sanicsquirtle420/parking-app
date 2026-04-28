@@ -3,7 +3,7 @@ from datetime import datetime
 from kivy.config import Config
 Config.set('graphics', 'multisamples', '0')
 
-from kivy.graphics import Color, Rectangle
+from kivy.graphics import Color, Line, Rectangle
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
 from kivy.uix.label import Label
@@ -11,6 +11,7 @@ from kivy.uix.popup import Popup
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.spinner import Spinner
 from kivy.uix.textinput import TextInput
+from kivy.uix.widget import Widget
 
 from utils.admin_navigation import AdminScreen
 from database.db import run_in_background
@@ -23,6 +24,7 @@ from database.queries.admin_permits import (
     revoke_user_permit,
     renew_user_permit,
 )
+from database.queries.tickets import create_ticket, delete_ticket, get_user_tickets, toggle_ticket_status
 
 NAVY = (0.07, 0.12, 0.26, 1)
 LIGHT_BG = (0.96, 0.97, 0.98, 1)
@@ -490,7 +492,7 @@ class AdminPermitsScreen(AdminScreen):
         card = BoxLayout(
             orientation="vertical",
             size_hint_y=None,
-            height=190,
+            height=160,
             padding=[15, 12],
             spacing=10
         )
@@ -547,12 +549,18 @@ class AdminPermitsScreen(AdminScreen):
         )
         info.bind(size=self.update_label_text_size)
 
-        row = BoxLayout(size_hint_y=None, height=45, spacing=10)
+        row = BoxLayout(
+            orientation="horizontal",
+            size_hint_x=1,
+            size_hint_y=None,
+            height=40,
+            spacing=8,
+        )
 
         spinner = Spinner(
-            text="Select Permit",
+            text="Select Permit Type",
             values=list(self.permit_map.keys()),
-            size_hint_x=0.4,
+            size_hint_x=0.35,
             size_hint_y=None,
             height=40,
             background_normal="",
@@ -562,7 +570,7 @@ class AdminPermitsScreen(AdminScreen):
 
         assign = Button(
             text="Assign",
-            size_hint_x=0.2,
+            size_hint_x=0.13,
             size_hint_y=None,
             height=40,
             background_normal="",
@@ -570,34 +578,460 @@ class AdminPermitsScreen(AdminScreen):
         )
         revoke = Button(
             text="Revoke",
-            size_hint_x=0.2,
+            size_hint_x=0.13,
             size_hint_y=None,
-            height=40,
+            height=40, 
             background_normal="",
             background_color=RED
         )
         renew = Button(
             text="Renew",
-            size_hint_x=0.2,
+            size_hint_x=0.13,
             size_hint_y=None,
             height=40,
             background_normal="",
             background_color=GREEN
         )
+        ticket_btn = Button(
+            text="Ticket",
+            size_hint_x=0.13,
+            size_hint_y=None,
+            height=40,
+            background_normal="",
+            background_color=NAVY
+        )
 
         assign.bind(on_release=lambda x: self.assign(user, spinner))
         revoke.bind(on_release=lambda x: self.revoke(user))
         renew.bind(on_release=lambda x: self.renew(user))
+        ticket_btn.bind(on_release=lambda x: self.open_ticket_popup(user))
 
         row.add_widget(spinner)
         row.add_widget(assign)
         row.add_widget(revoke)
         row.add_widget(renew)
+        row.add_widget(ticket_btn)
 
         card.add_widget(info)
         card.add_widget(row)
 
         return card
+
+    def open_ticket_popup(self, user):
+        POPUP_NAVY = (0.082, 0.129, 0.239, 1)
+        POPUP_RED = (0.8, 0, 0, 1)
+        POPUP_WHITE = (1, 1, 1, 1)
+        POPUP_FIELD_BG = (0.973, 0.976, 0.984, 1)
+
+        outer = BoxLayout(orientation="vertical")
+
+        # Header bar
+        header = BoxLayout(orientation="horizontal", size_hint_y=None, height=60)
+        with header.canvas.before:
+            Color(*POPUP_NAVY)
+            header.rect = Rectangle(pos=header.pos, size=header.size)
+        header.bind(pos=self.update_rect, size=self.update_rect)
+        header_label = Label(
+            text="User Tickets",
+            color=POPUP_WHITE,
+            font_size=22,
+            bold=True,
+            halign="left",
+            padding=[16, 0],
+        )
+        header_label.bind(size=self.update_label_text_size)
+        header.add_widget(header_label)
+        outer.add_widget(header)
+
+        # Red accent bar
+        accent = BoxLayout(size_hint_y=None, height=4)
+        with accent.canvas.before:
+            Color(*POPUP_RED)
+            accent.rect = Rectangle(pos=accent.pos, size=accent.size)
+        accent.bind(pos=self.update_rect, size=self.update_rect)
+        outer.add_widget(accent)
+
+        # White content area
+        content = BoxLayout(orientation="vertical", spacing=14, padding=[20, 16, 20, 16])
+        with content.canvas.before:
+            Color(*POPUP_WHITE)
+            content.rect = Rectangle(pos=content.pos, size=content.size)
+        content.bind(pos=self.update_rect, size=self.update_rect)
+
+        status_label = Label(
+            text="",
+            size_hint_y=None,
+            height=20,
+            color=(0.5, 0.5, 0.5, 1),
+            halign="left",
+            valign="middle",
+        )
+        status_label.bind(size=self.update_label_text_size)
+        content.add_widget(status_label)
+
+        # "EXISTING TICKETS" section label
+        section_existing = Label(
+            text="EXISTING TICKETS",
+            size_hint_y=None,
+            height=24,
+            color=(0.45, 0.45, 0.45, 1),
+            bold=True,
+            font_size=11,
+            halign="left",
+            valign="middle",
+        )
+        section_existing.bind(size=self.update_label_text_size)
+        content.add_widget(section_existing)
+
+        ticket_list = BoxLayout(orientation="vertical", spacing=6, size_hint_y=None, padding=[0, 0, 0, 4])
+        ticket_list.bind(minimum_height=ticket_list.setter("height"))
+
+        ticket_scroll = ScrollView(size_hint_x=1, size_hint_y=None, height=212)
+        ticket_scroll.add_widget(ticket_list)
+        content.add_widget(ticket_scroll)
+
+        # "ADD TICKET" section label
+        section_add = Label(
+            text="ADD TICKET",
+            size_hint_y=None,
+            height=24,
+            color=(0.45, 0.45, 0.45, 1),
+            bold=True,
+            font_size=11,
+            halign="left",
+            valign="middle",
+        )
+        section_add.bind(size=self.update_label_text_size)
+        content.add_widget(section_add)
+
+        amount_input = TextInput(
+            hint_text="Amount",
+            multiline=False,
+            size_hint_y=None,
+            height=48,
+            padding=[12, 10],
+            font_size=15,
+            hint_text_color=(0.6, 0.6, 0.6, 1),
+            background_color=POPUP_FIELD_BG,
+            foreground_color=(0.1, 0.1, 0.1, 1),
+        )
+        description_input = TextInput(
+            hint_text="Description",
+            multiline=True,
+            size_hint_y=None,
+            height=110,
+            padding=[12, 10],
+            font_size=15,
+            hint_text_color=(0.6, 0.6, 0.6, 1),
+            background_color=POPUP_FIELD_BG,
+            foreground_color=(0.1, 0.1, 0.1, 1),
+        )
+        status_spinner = Button(
+            text="Unpaid",
+            size_hint_y=None,
+            height=48,
+            font_size=15,
+            bold=True,
+            background_normal="",
+            background_color=POPUP_RED,
+            color=POPUP_WHITE,
+        )
+        def _toggle_status(btn):
+            if btn.text == "Unpaid":
+                btn.text = "Paid"
+                btn.background_color = (0.18, 0.49, 0.196, 1)
+            else:
+                btn.text = "Unpaid"
+                btn.background_color = POPUP_RED
+        status_spinner.bind(on_release=_toggle_status)
+
+        content.add_widget(amount_input)
+        content.add_widget(description_input)
+        content.add_widget(status_spinner)
+
+        # Bottom button row
+        button_row = BoxLayout(
+            orientation="horizontal",
+            size_hint_y=None,
+            height=48,
+            spacing=10,
+        )
+        button_row.add_widget(Widget(size_hint_x=1))
+
+        add_btn = Button(
+            text="Add Ticket",
+            size_hint_x=None,
+            width=150,
+            size_hint_y=None,
+            height=48,
+            font_size=14,
+            bold=True,
+            background_normal="",
+            background_color=POPUP_NAVY,
+            color=POPUP_WHITE,
+        )
+
+        close_btn = Button(
+            text="Close",
+            size_hint_x=None,
+            width=150,
+            size_hint_y=None,
+            height=48,
+            font_size=14,
+            background_normal="",
+            background_color=POPUP_WHITE,
+            color=POPUP_NAVY,
+        )
+        with close_btn.canvas.after:
+            Color(*POPUP_NAVY)
+            close_btn._border_line = Line(rectangle=(0, 0, 1, 1), width=1.2)
+
+        def _update_close_border(btn, *_):
+            btn._border_line.rectangle = (btn.x, btn.y, btn.width, btn.height)
+        close_btn.bind(pos=_update_close_border, size=_update_close_border)
+
+        button_row.add_widget(add_btn)
+        button_row.add_widget(close_btn)
+        content.add_widget(button_row)
+
+        outer.add_widget(content)
+
+        popup = Popup(
+            title="",
+            title_size=0,
+            separator_height=0,
+            content=outer,
+            size_hint=(None, None),
+            size=(750, 760),
+            pos_hint={"center_x": 0.5, "center_y": 0.5},
+            background="atlas://data/images/defaulttheme/modalview-background",
+            background_color=(1, 1, 1, 1),
+        )
+
+        popup_state = {
+            "user": user,
+            "ticket_list": ticket_list,
+            "status_label": status_label,
+            "amount_input": amount_input,
+            "description_input": description_input,
+            "status_spinner": status_spinner,
+        }
+
+        add_btn.bind(on_release=lambda *_: self.add_ticket_from_popup(popup_state))
+        close_btn.bind(on_release=popup.dismiss)
+        popup.bind(on_open=lambda *_: self.load_ticket_popup_list(popup_state))
+        popup.open()
+
+    def load_ticket_popup_list(self, popup_state, clear_status=True):
+        ticket_list = popup_state["ticket_list"]
+        status_label = popup_state["status_label"]
+        ticket_list.clear_widgets()
+        ticket_list.add_widget(Label(
+            text="Loading tickets...",
+            size_hint_y=None,
+            height=40,
+            color=(0.4, 0.4, 0.4, 1),
+        ))
+        if clear_status:
+            status_label.text = ""
+        user_id = popup_state["user"]["user_id"]
+
+        run_in_background(
+            lambda: get_user_tickets(user_id),
+            lambda tickets: self.apply_ticket_popup_list(popup_state, tickets),
+        )
+
+    def apply_ticket_popup_list(self, popup_state, tickets):
+        ticket_list = popup_state["ticket_list"]
+        status_label = popup_state["status_label"]
+        ticket_list.clear_widgets()
+
+        if tickets is None:
+            status_label.text = "Unable to load tickets."
+            return
+
+        if not tickets:
+            ticket_list.add_widget(Label(
+                text="No tickets found",
+                size_hint_y=None,
+                height=40,
+                color=(0.4, 0.4, 0.4, 1),
+            ))
+            return
+
+        for ticket in tickets:
+            ticket_list.add_widget(self.build_admin_ticket_card(ticket, popup_state))
+
+    def build_admin_ticket_card(self, ticket, popup_state):
+        POPUP_NAVY = (0.082, 0.129, 0.239, 1)
+        FIELD_BG = (0.973, 0.976, 0.984, 1)
+        GREEN_BG = (0.91, 0.961, 0.914, 1)
+        GREEN_TEXT = (0.18, 0.49, 0.196, 1)
+
+        card = BoxLayout(
+            orientation="horizontal",
+            size_hint_y=None,
+            height=80,
+            padding=[12, 10],
+            spacing=8,
+        )
+        with card.canvas.before:
+            Color(*FIELD_BG)
+            card.rect = Rectangle(pos=card.pos, size=card.size)
+        card.bind(pos=self.update_rect, size=self.update_rect)
+
+        description = ticket.get("description") or "No description provided"
+        issue_date = str(ticket.get("issue_date") or "")
+        ticket_id = ticket.get("ticket_id")
+
+        text_col = BoxLayout(orientation="vertical", size_hint_x=1)
+        date_label = Label(
+            text=issue_date,
+            color=(0.35, 0.35, 0.35, 1),
+            font_size=13,
+            halign="left",
+            valign="middle",
+            size_hint_y=None,
+            height=24,
+        )
+        date_label.bind(size=self.update_label_text_size)
+        desc_label = Label(
+            text=description,
+            color=TEXT_DARK,
+            font_size=14,
+            bold=True,
+            halign="left",
+            valign="middle",
+            size_hint_y=None,
+            height=28,
+        )
+        desc_label.bind(size=self.update_label_text_size)
+        text_col.add_widget(date_label)
+        text_col.add_widget(desc_label)
+
+        badges = BoxLayout(orientation="vertical", size_hint_x=None, width=100, spacing=4)
+
+        amount_badge = Label(
+            text=f"${ticket.get('amount')}",
+            size_hint_y=None,
+            height=28,
+            font_size=13,
+            bold=True,
+            color=(1, 1, 1, 1),
+            padding=(10, 4),
+        )
+        with amount_badge.canvas.before:
+            Color(*POPUP_NAVY)
+            amount_badge.rect = Rectangle(pos=amount_badge.pos, size=amount_badge.size)
+        amount_badge.bind(pos=self.update_rect, size=self.update_rect)
+
+        status_val = (ticket.get("status") or "").capitalize()
+        is_paid = status_val.lower() == "paid"
+
+        status_btn = Button(
+            text=status_val,
+            size_hint_y=None,
+            height=22,
+            font_size=12,
+            bold=False,
+            background_normal="",
+            background_color=GREEN_BG if is_paid else (1.0, 0.9, 0.9, 1),
+            color=GREEN_TEXT if is_paid else (0.75, 0.1, 0.1, 1),
+        )
+
+        def _toggle(btn, tid=ticket_id):
+            new_status = "Unpaid" if btn.text.lower() == "paid" else "Paid"
+            run_in_background(
+                lambda: toggle_ticket_status(tid, new_status),
+                lambda _: self.load_ticket_popup_list(popup_state),
+            )
+        status_btn.bind(on_release=_toggle)
+
+        badges.add_widget(amount_badge)
+        badges.add_widget(status_btn)
+
+        delete_btn = Button(
+            text="Delete",
+            size_hint_x=None,
+            width=64,
+            size_hint_y=None,
+            height=36,
+            font_size=12,
+            bold=True,
+            background_normal="",
+            background_color=(0.75, 0.1, 0.1, 1),
+            color=(1, 1, 1, 1),
+        )
+
+        delete_col = BoxLayout(
+            orientation="vertical",
+            size_hint_x=None,
+            width=64,
+        )
+        delete_col.add_widget(Widget())
+        delete_col.add_widget(delete_btn)
+        delete_col.add_widget(Widget())
+
+        def _delete(btn, tid=ticket_id):
+            run_in_background(
+                lambda: delete_ticket(tid),
+                lambda _: self.load_ticket_popup_list(popup_state),
+            )
+        delete_btn.bind(on_release=_delete)
+
+        card.add_widget(text_col)
+        card.add_widget(badges)
+        card.add_widget(delete_col)
+        return card
+
+    def add_ticket_from_popup(self, popup_state):
+        user_id = popup_state["user"]["user_id"]
+        amount_input = popup_state["amount_input"]
+        description_input = popup_state["description_input"]
+        status_spinner = popup_state["status_spinner"]
+        status_label = popup_state["status_label"]
+
+        amount_text = amount_input.text.strip()
+        description = description_input.text.strip()
+        status = status_spinner.text
+
+        if not amount_text:
+            status_label.text = "Amount is required."
+            return
+
+        try:
+            amount = float(amount_text)
+        except ValueError:
+            status_label.text = "Amount must be numeric."
+            return
+
+        if amount <= 0:
+            status_label.text = "Amount must be greater than zero."
+            return
+
+        if not description:
+            status_label.text = "Description is required."
+            return
+
+        status_label.text = "Adding ticket..."
+        run_in_background(
+            lambda: create_ticket(user_id, amount, description, status),
+            lambda result: self.after_ticket_created(popup_state, result),
+        )
+
+    def after_ticket_created(self, popup_state, result):
+        status_label = popup_state["status_label"]
+
+        if not result or not result.get("ok"):
+            status_label.text = result.get("message") if result else "Unable to create ticket."
+            return
+
+        popup_state["amount_input"].text = ""
+        popup_state["description_input"].text = ""
+        popup_state["status_spinner"].text = "Unpaid"
+        popup_state["status_spinner"].background_color = (0.8, 0, 0, 1)
+        status_label.text = ""
+        self.load_ticket_popup_list(popup_state, clear_status=False)
 
     def assign(self, user, spinner):
         if spinner.text not in self.permit_map:
